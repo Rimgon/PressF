@@ -1,0 +1,2 @@
+   text	   data	    bss	    dec	    hex	filename
+  35444	   3424	   5580	  44448	   ada0	../FEHROBOTTESTCODE.elf
