@@ -44,7 +44,7 @@ void move(int direction, float distance){//direction 1 is forward, direction -1 
         else if(direction == -1){//If backward, show an acknowledgement on the proteus screen
             LCD.WriteLine("Going backwards");
         }
-        leftmotor.SetPercent(direction * -25.);//Set the left motor to it's appropriate speed and direction
+        leftmotor.SetPercent(direction * -21.);//Set the left motor to it's appropriate speed and direction
         rightmotor.SetPercent(direction * -18.);//Set the right motor it it's appropriate speed and direction
         while((left_encoder.Counts() + right_encoder.Counts())/2 < counts);//Continue moving until the average of the two encoder counts is
         rightmotor.Stop();//stop motors
