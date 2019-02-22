@@ -14,7 +14,7 @@ FEHMotor rightmotor(FEHMotor::Motor0,9.0);//the right motor is on port 1 on the 
 DigitalEncoder right_encoder(FEHIO::P3_7);//right motor encoder is currently set to first port of 0 bank on proteus
 DigitalEncoder left_encoder(FEHIO::P0_0);//left motor encoder is current set to second port of 0 bank on proteus
 #define FORWARD_PERCENT -25.0//This defines the default speed at which the robot goes forward
-#define COUNTS_PER_INCH 50//This defines how far per inch the robot will go in specification with the encoder
+#define COUNTS_PER_INCH 25//This defines how far per inch the robot will go in specification with the encoder
 #define BACKWARDS_PERCENT -18.0//This defines how fast the robot will go while moving backwards
 #define COUNTS_PER_DEGREE 1//This defines how many counts the encoder should do per degree
 int ddrCheck=0;
