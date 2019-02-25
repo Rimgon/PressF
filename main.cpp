@@ -44,8 +44,8 @@ void move(int direction, float distance){//direction 1 is forward, direction -1 
         else if(direction == -1){//If backward, show an acknowledgement on the proteus screen
             LCD.WriteLine("Going backwards");
         }
-        leftmotor.SetPercent(direction * -60.);//Set the left motor to it's appropriate speed and direction
-        rightmotor.SetPercent(direction * -57.);//Set the right motor it it's appropriate speed and direction
+        leftmotor.SetPercent(direction * -70.);//Set the left motor to it's appropriate speed and direction
+        rightmotor.SetPercent(direction * -67.);//Set the right motor it it's appropriate speed and direction
         while( left_encoder.Counts() < counts){}//Continue moving until the average of the two encoder counts is
         rightmotor.Stop();//stop motors
         leftmotor.Stop();
@@ -104,7 +104,7 @@ void instructionSet(){//This function is the instruction set that is a list of i
     turn(1,67);
     move(1,14);
     turn(0,98);
-    move(1,47);
+    move(1,55);
     turn(0,93);
     move(1,25);
 
