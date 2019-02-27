@@ -8,15 +8,18 @@
 #include <FEHUtility.h>
 #include <FEHMotor.h>
 #include <FEHServo.h>
+
 AnalogInputPin photoresis(FEHIO::P0_1);
 FEHMotor leftmotor(FEHMotor::Motor1,9.0);//the left motor is on port 0 on the proteus
 FEHMotor rightmotor(FEHMotor::Motor0,9.0);//the right motor is on port 1 on the proteus
 DigitalEncoder right_encoder(FEHIO::P3_7);//right motor encoder is currently set to first port of 0 bank on proteus
 DigitalEncoder left_encoder(FEHIO::P0_0);//left motor encoder is current set to second port of 0 bank on proteus
+
 #define FORWARD_PERCENT -25.0//This defines the default speed at which the robot goes forward
 #define COUNTS_PER_INCH 33.74//This defines how far per inch the robot will go in specification with the encoder
 #define BACKWARDS_PERCENT 18.0//This defines how fast the robot will go while moving backwards
 #define COUNTS_PER_DEGREE 1.7//This defines how many counts the encoder should do per degree
+
 int ddrCheck=0;
 
 
@@ -40,8 +43,7 @@ void move(int direction, float distance){//direction 1 is forward, direction -1 
 
         if(direction == 1){//If forward, show an acknowledgement on the proteus screen
             LCD.WriteLine("Going forward");
-        }
-        else if(direction == -1){//If backward, show an acknowledgement on the proteus screen
+        }else if(direction == -1){//If backward, show an acknowledgement on the proteus screen
             LCD.WriteLine("Going backwards");
         }
         leftmotor.SetPercent(direction * -70.);//Set the left motor to it's appropriate speed and direction
@@ -85,8 +87,7 @@ void detectColorDDR(){//red is 1, blue is 2. This function is to detect the ligh
         move(-1,2);
         Sleep(5.0);
         ddrCheck = 1;
-    }
-    else if (photoresis.Value()>1){
+    }else if (photoresis.Value()>1){
        // move(1,5);
         turn(1,90);
         move(-1,2);
@@ -110,6 +111,7 @@ void instructionSet(){//This function is the instruction set that is a list of i
     move(1,25);
 
 }
+
 int main(void)//The main function is intentionally bare to make things easy to read
 {
     instructionSet();
