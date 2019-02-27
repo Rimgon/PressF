@@ -48,7 +48,7 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     }else if(distance < 0){//If backward, show an acknowledgement on the proteus screen
         LCD.WriteLine("Going backwards");
     }else{
-        LCD.WriteLine("Improper distance parameter: %f" %distance)
+        LCD.WriteLine("Improper distance parameter: %f" %distance);
     }
 
     //distance/abs(distance) returns 1 or -1 for forwards or backwards motion, respectively
