@@ -43,21 +43,23 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     right_encoder.ResetCounts();//reset the counts for both encoders
     left_encoder.ResetCounts();
 
-        if(distance > 0){//If forward, show an acknowledgement on the proteus screen
-            LCD.WriteLine("Going forward");
-        }else if(distance < 0){//If backward, show an acknowledgement on the proteus screen
-            LCD.WriteLine("Going backwards");
-        }else{
-            LCD.WriteLine("Improper distance parameter: %f" %distance)
-        }
+    if(distance > 0){//If forward, show an acknowledgement on the proteus screen
+        LCD.WriteLine("Going forward");
+    }else if(distance < 0){//If backward, show an acknowledgement on the proteus screen
+        LCD.WriteLine("Going backwards");
+    }else{
+        LCD.WriteLine("Improper distance parameter: %f" %distance)
+    }
 
-        //distance/abs(distance) returns 1 or -1 for forwards or backwards motion, respectively
-        leftmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the left motor to it's appropriate speed and direction
-        rightmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the right motor it it's appropriate speed and direction
-        while(left_encoder.Counts() < counts){LCD.WriteLine("Encoder position: %d\r" %left_encoder.Counts)}//Continue moving until the average of the two encoder counts is
-        rightmotor.Stop();//stop motors
-        leftmotor.Stop();
-        Sleep(50);//wait for 50 ms to allow for some downtime so nothing weird happens
+    //distance/abs(distance) returns 1 or -1 for forwards or backwards motion, respectively
+    leftmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the left motor to it's appropriate speed and direction
+    rightmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the right motor it it's appropriate speed and direction
+
+    while(left_encoder.Counts() < counts){LCD.WriteLine("Encoder position: %d\r" %left_encoder.Counts)}//Continue moving until the average of the two encoder counts is
+
+    rightmotor.Stop();//stop motors
+    leftmotor.Stop();
+    Sleep(50);//wait for 50 ms to allow for some downtime so nothing weird happens
 
 
 
@@ -90,7 +92,7 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
 void detectColorDDR(){//red is 1, blue is 2. This function is to detect the light at DDR and act accordingly.
     if(photoresis.Value()<1){
         turn(1,90);
-        move(-1,2);
+        move(0.3,-2);
         Sleep(5.0);
         ddrCheck = 1;
     }else if (photoresis.Value()>1){
@@ -108,13 +110,13 @@ void instructionSet(){//This function is the instruction set that is a list of i
     //move(1,60);//undershoot
    // turn(1,45);
     Sleep(3.0);
-    move(1,4);
+    move(0.3,4);
     turn(1,67);
-    move(1,14);
+    move(0.3,14);
     turn(0,98);
-    move(1,51);
+    move(0.6,51);
     turn(0,93);
-    move(1,25);
+    move(0.3,25);
 
 }
 
