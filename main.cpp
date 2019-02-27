@@ -96,15 +96,16 @@ void detectColorDDR(){//red is 1, blue is 2. This function is to detect the ligh
 
 
 void instructionSet(){//This function is the instruction set that is a list of instructions
-    startUp();
+   // startUp();
    // turn(0,45);
     //move(1,60);//undershoot
    // turn(1,45);
+    Sleep(3.0);
     move(1,4);
     turn(1,67);
     move(1,14);
     turn(0,98);
-    move(1,55);
+    move(1,51);
     turn(0,93);
     move(1,25);
 
