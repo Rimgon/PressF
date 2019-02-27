@@ -37,20 +37,24 @@ void startUp(){//This function waits until the proteus screen has been tapped to
 }
 
 
-void move(int direction, float distance){//direction 1 is forward, direction -1 is backwards, distance in inches, this function tells the robot which direction to move in and how far
-    int counts = distance*COUNTS_PER_INCH;//the number of counts is equal to the distance times the defined constant COUNTS_PER_INCH
+void move(float speed, float distance){//direction 1 is forward, direction -1 is backwards, distance in inches, this function tells the robot which direction to move in and how far
+    int counts = abs(distance)*COUNTS_PER_INCH;//the number of counts is equal to the distance times the defined constant COUNTS_PER_INCH
 
     right_encoder.ResetCounts();//reset the counts for both encoders
     left_encoder.ResetCounts();
 
-        if(direction == 1){//If forward, show an acknowledgement on the proteus screen
+        if(distance > 0){//If forward, show an acknowledgement on the proteus screen
             LCD.WriteLine("Going forward");
-        }else if(direction == -1){//If backward, show an acknowledgement on the proteus screen
+        }else if(distance < 0){//If backward, show an acknowledgement on the proteus screen
             LCD.WriteLine("Going backwards");
+        }else{
+            LCD.WriteLine("Improper distance parameter: %f" %distance)
         }
-        leftmotor.SetPercent(direction * -70.);//Set the left motor to it's appropriate speed and direction
-        rightmotor.SetPercent(direction * -67.);//Set the right motor it it's appropriate speed and direction
-        while( left_encoder.Counts() < counts){}//Continue moving until the average of the two encoder counts is
+
+        //distance/abs(distance) returns 1 or -1 for forwards or backwards motion, respectively
+        leftmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the left motor to it's appropriate speed and direction
+        rightmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the right motor it it's appropriate speed and direction
+        while(left_encoder.Counts() < counts){LCD.WriteLine("Encoder position: %d\r" %left_encoder.Counts)}//Continue moving until the average of the two encoder counts is
         rightmotor.Stop();//stop motors
         leftmotor.Stop();
         Sleep(50);//wait for 50 ms to allow for some downtime so nothing weird happens
