@@ -2,19 +2,21 @@
 //Teammates: Alex King, Michelle Lee, Hrithik Basu
 //Team: Press F To Pay Respects (D5)
 
-//These are the declarations of motors, encoders, and constants used throughout the program
+//Including all libraries
 #include <FEHLCD.h>
 #include <FEHIO.h>
 #include <FEHUtility.h>
 #include <FEHMotor.h>
 #include <FEHServo.h>
 
+//Instantiation of devices
 AnalogInputPin photoresis(FEHIO::P0_1);
 FEHMotor leftmotor(FEHMotor::Motor1,9.0);//the left motor is on port 0 on the proteus
 FEHMotor rightmotor(FEHMotor::Motor0,9.0);//the right motor is on port 1 on the proteus
 DigitalEncoder right_encoder(FEHIO::P3_7);//right motor encoder is currently set to first port of 0 bank on proteus
 DigitalEncoder left_encoder(FEHIO::P0_0);//left motor encoder is current set to second port of 0 bank on proteus
 
+//Defining constants for use throughout the code
 #define FORWARD_PERCENT -25.0//This defines the default speed at which the robot goes forward
 #define COUNTS_PER_INCH 33.74//This defines how far per inch the robot will go in specification with the encoder
 #define BACKWARDS_PERCENT 18.0//This defines how fast the robot will go while moving backwards
