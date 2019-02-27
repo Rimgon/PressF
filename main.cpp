@@ -21,6 +21,7 @@ DigitalEncoder left_encoder(FEHIO::P0_0);//left motor encoder is current set to 
 #define COUNTS_PER_INCH 33.74//This defines how far per inch the robot will go in specification with the encoder
 #define BACKWARDS_PERCENT 18.0//This defines how fast the robot will go while moving backwards
 #define COUNTS_PER_DEGREE 1.7//This defines how many counts the encoder should do per degree
+#define POWER 0.02//This defines the power with which the 'pid' loop corrects itself. Higher is stronger, but prone to wobble
 
 int ddrCheck=0;
 
@@ -42,6 +43,8 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
 
     inputSpeed = speed;      //This value will be important later
 
+    leftSpeed = rightSpeed = speed
+
     right_encoder.ResetCounts();//reset the counts for both encoders
     left_encoder.ResetCounts();
 
@@ -53,21 +56,46 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
         LCD.WriteLine("Improper distance parameter: %f" %distance);
     }
 
-    //distance/abs(distance) returns 1 or -1 for forwards or backwards motion, respectively
-    leftmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the left motor to it's appropriate speed and direction
-    rightmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the right motor it it's appropriate speed and direction
-
 
     lastTime = TimeNow();
     leftLastCounts = left_encoder.Counts();
     rightLastCounts = right_encoder.Counts();
     while(left_encoder.Counts() < counts && right_encoder.Counts() < counts){
         LCD.WriteLine("L_Encoder position: %d\r" %left_encoder.Counts);    //Display the current encoder positions
+        leftCurrentCounts = left_encoder.Counts();
+        rightCurrentCounts = right_encoder.Counts();
+        currTime = TimeNow();
 
-        
+        leftTickSpeed = (leftCurrentCounts - leftLastCounts)/(currTime-lastTime);
+        rightTickSpeed = (rightCurrentCounts - rightLastCounts)/(currTime-lastTime);
 
+        if(leftTickSpeed>rightTickSpeed){       //Find which side is going faster. Here we handle left being fast
+            if(leftSpeed>inputSpeed){           //If we're at the capped speed, lower the speed rather than picking up the pace on the other side
+                //leftSpeed-=(leftSpeed/abs(leftSpeed))*POWER;
+                ;//Currently we're not going to care about the speed cap, pending solution
+            }else{                              //Otherwise, speed up the right side to try and catch up
+                rightSpeed+=(rightSpeed/abs(rightSpeed))*POWER;
+            }
+        }else if(rightTickSpeed>leftTickSpeed){  //Handle the right side being faster
+            if(rightSpeed>inputSpeed){           //If we're at the capped speed, lower the speed rather than picking up the pace on the other side
+                //rightSpeed-=(rightSpeed/abs(rightSpeed))*POWER;
+                ;//Currently we're not going to care about the speed cap, pending solution
+            }else{                              //Otherwise, speed up the right side to try and catch up
+                leftSpeed+=(leftSpeed/abs(leftSpeed))*POWER;
+            }
+        }
 
-    }//Continue moving until the average of the two encoder counts is
+        //distance/abs(distance) returns 1 or -1 for forwards or backwards motion, respectively
+        //Update the speeds
+        leftmotor.SetPercent(-(distance/abs(distance)) * leftSpeed);//Set the left motor to it's appropriate speed and direction
+        rightmotor.SetPercent(-(distance/abs(distance)) * rightSpeed);//Set the right motor it it's appropriate speed and direction
+
+        //Update measurements to have a new point to compare to
+        lastTime = currTime;
+        leftLastCounts = leftCurrentCounts;
+        rightLastCounts = rightCurrentCounts;
+
+    }
 
     rightmotor.Stop();//stop motors
     leftmotor.Stop();
