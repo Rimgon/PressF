@@ -40,6 +40,8 @@ void startUp(){//This function waits until the proteus screen has been tapped to
 void move(float speed, float distance){//direction 1 is forward, direction -1 is backwards, distance in inches, this function tells the robot which direction to move in and how far
     int counts = abs(distance)*COUNTS_PER_INCH;//the number of counts is equal to the distance times the defined constant COUNTS_PER_INCH
 
+    inputSpeed = speed;      //This value will be important later
+
     right_encoder.ResetCounts();//reset the counts for both encoders
     left_encoder.ResetCounts();
 
@@ -48,22 +50,31 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     }else if(distance < 0){//If backward, show an acknowledgement on the proteus screen
         LCD.WriteLine("Going backwards");
     }else{
-        LCD.WriteLine("Improper distance parameter: %f" %distance)
+        LCD.WriteLine("Improper distance parameter: %f" %distance);
     }
 
     //distance/abs(distance) returns 1 or -1 for forwards or backwards motion, respectively
     leftmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the left motor to it's appropriate speed and direction
     rightmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the right motor it it's appropriate speed and direction
 
-    while(left_encoder.Counts() < counts){LCD.WriteLine("Encoder position: %d\r" %left_encoder.Counts)}//Continue moving until the average of the two encoder counts is
+
+    lastTime = TimeNow();
+    leftLastCounts = left_encoder.Counts();
+    rightLastCounts = right_encoder.Counts();
+    while(left_encoder.Counts() < counts && right_encoder.Counts() < counts){
+        LCD.WriteLine("L_Encoder position: %d\r" %left_encoder.Counts);    //Display the current encoder positions
+
+        
+
+
+    }//Continue moving until the average of the two encoder counts is
 
     rightmotor.Stop();//stop motors
     leftmotor.Stop();
     Sleep(50);//wait for 50 ms to allow for some downtime so nothing weird happens
-
-
-
 }
+
+
 void turn(int direction, int angle){//direction 0 is left, direction 1 is right, angle is from 0 to 360 degrees
     int counts = angle*COUNTS_PER_DEGREE;//counts here is the equivalent of the angle times the defined constant COUNTS_PER_DEGREE
 
@@ -89,6 +100,8 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
     }
     Sleep(50);//Sleep Check
 }
+
+
 void detectColorDDR(){//red is 1, blue is 2. This function is to detect the light at DDR and act accordingly.
     if(photoresis.Value()<1){
         turn(1,90);
@@ -120,10 +133,8 @@ void instructionSet(){//This function is the instruction set that is a list of i
 
 }
 
+
 int main(void)//The main function is intentionally bare to make things easy to read
 {
     instructionSet();
-
 }
-
-
