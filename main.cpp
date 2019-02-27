@@ -96,9 +96,9 @@ void detectColorDDR(){//red is 1, blue is 2. This function is to detect the ligh
         Sleep(5.0);
         ddrCheck = 1;
     }else if (photoresis.Value()>1){
-       // move(1,5);
+       // move(0.3,5);
         turn(1,90);
-        move(-1,2);
+        move(0.3,-2);
         Sleep(5.0);
     }
 }
@@ -107,7 +107,7 @@ void detectColorDDR(){//red is 1, blue is 2. This function is to detect the ligh
 void instructionSet(){//This function is the instruction set that is a list of instructions
    // startUp();
    // turn(0,45);
-    //move(1,60);//undershoot
+    //move(0.3,60);//undershoot
    // turn(1,45);
     Sleep(3.0);
     move(0.3,4);
