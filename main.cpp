@@ -56,7 +56,7 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     }
 
     //distance/abs(distance) returns 1 or -1 for forwards or backwards motion, respectively
-    leftmotor.SetPercent(-(distance/abs(distance)) * speed-3);//Set the left motor to it's appropriate speed and direction
+    leftmotor.SetPercent(-(distance/abs(distance)) * speed-2);//Set the left motor to it's appropriate speed and direction
     rightmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the right motor it it's appropriate speed and direction
 
     while(left_encoder.Counts() < counts){
@@ -100,22 +100,33 @@ void detectColorDDR(){//red is 1, blue is 2. This function is to detect the ligh
     while(photoresis.Value()>.4){}
     LCD.WriteLine("Passed the while");
     if(photoresis.Value()<.3){
-        turn(0,90);
-        move(30,-2);
+        LCD.SetBackgroundColor(RED);
+        turn(0,45);
+        move(30.,3);
+        turn(1,45);
+        move(30.,2);
+        turn(0,103);
+
+        move(30.,-6);
         Sleep(5.0);
        // ddrCheck = 1;
     }
     else  {
-        move(30,9.25);
-        turn(0,90);
-        move(30,-2);
+        turn(0,45);
+        LCD.SetBackgroundColor(BLUE);
+        move(30.,3);
+        turn(1,45);
+        move(30.,7);
+        turn(0,103);
+
+        move(30.,-6);
         Sleep(5.0);
     }
 }
 
 
 void instructionSet(){//This function is the instruction set that is a list of instructions
-   startUp();
+  startUp();
    // turn(0,45);
     //move(30.,60);//undershoot
    // turn(1,45);
