@@ -8,6 +8,7 @@
 #include <FEHUtility.h>
 #include <FEHMotor.h>
 #include <FEHServo.h>
+#include <math.h>
 
 //Instantiation of devices
 AnalogInputPin photoresis(FEHIO::P0_1);
@@ -48,14 +49,14 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     }else if(distance < 0){//If backward, show an acknowledgement on the proteus screen
         LCD.WriteLine("Going backwards");
     }else{
-        LCD.WriteLine("Improper distance parameter: %f" %distance);
+        LCD.WriteLine("Improper distance parameter");
     }
 
     //distance/abs(distance) returns 1 or -1 for forwards or backwards motion, respectively
     leftmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the left motor to it's appropriate speed and direction
     rightmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the right motor it it's appropriate speed and direction
 
-    while(left_encoder.Counts() < counts){LCD.WriteLine("Encoder position: %d\r" %left_encoder.Counts)}//Continue moving until the average of the two encoder counts is
+    while(left_encoder.Counts() < counts){LCD.WriteLine(left_encoder.Counts());}//Continue moving until the average of the two encoder counts is
 
     rightmotor.Stop();//stop motors
     leftmotor.Stop();
