@@ -17,6 +17,7 @@ FEHMotor rightmotor(FEHMotor::Motor0,9.0);//the right motor is on port 1 on the 
 DigitalEncoder right_encoder(FEHIO::P3_7);//right motor encoder is currently set to first port of 0 bank on proteus
 DigitalEncoder left_encoder(FEHIO::P0_0);//left motor encoder is current set to second port of 0 bank on proteus
 
+
 //Defining constants for use throughout the code
 #define FORWARD_PERCENT -25.0//This defines the default speed at which the robot goes forward
 #define COUNTS_PER_INCH 33.74//This defines how far per inch the robot will go in specification with the encoder
@@ -28,13 +29,15 @@ int ddrCheck=0;
 
 void startUp(){//This function waits until the proteus screen has been tapped to start the instruction set
 
-        float x,y;
+        /*float x,y;
         LCD.Clear(BLACK);
         LCD.SetFontColor(WHITE);
         LCD.WriteLine("Touch the screen to start");
         while(!LCD.Touch(&x,&y)){} //Wait for screen to be pressed
         while(LCD.Touch(&x,&y)){} //Wait for screen to be unpressed
-
+        */
+        //button to button is 5.25, between the lights 13.5
+        while(photoresis.Value()>.4){}
 }
 
 
@@ -53,10 +56,13 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     }
 
     //distance/abs(distance) returns 1 or -1 for forwards or backwards motion, respectively
-    leftmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the left motor to it's appropriate speed and direction
+    leftmotor.SetPercent(-(distance/abs(distance)) * speed-3);//Set the left motor to it's appropriate speed and direction
     rightmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the right motor it it's appropriate speed and direction
 
-    while(left_encoder.Counts() < counts){LCD.WriteLine(left_encoder.Counts());}//Continue moving until the average of the two encoder counts is
+    while(left_encoder.Counts() < counts){
+        //LCD.WriteLine(left_encoder.Counts());
+        ;
+    }//Continue moving until the average of the two encoder counts is
 
     rightmotor.Stop();//stop motors
     leftmotor.Stop();
@@ -91,33 +97,39 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
     Sleep(50);//Sleep Check
 }
 void detectColorDDR(){//red is 1, blue is 2. This function is to detect the light at DDR and act accordingly.
-    if(photoresis.Value()<1){
-        turn(1,90);
-        move(0.3,-2);
+    while(photoresis.Value()>.4){}
+    LCD.WriteLine("Passed the while");
+    if(photoresis.Value()<.3){
+        turn(0,90);
+        move(30,-2);
         Sleep(5.0);
-        ddrCheck = 1;
-    }else if (photoresis.Value()>1){
-       // move(0.3,5);
-        turn(1,90);
-        move(0.3,-2);
+       // ddrCheck = 1;
+    }
+    else  {
+        move(30,9.25);
+        turn(0,90);
+        move(30,-2);
         Sleep(5.0);
     }
 }
 
 
 void instructionSet(){//This function is the instruction set that is a list of instructions
-   // startUp();
+   startUp();
    // turn(0,45);
-    //move(0.3,60);//undershoot
+    //move(30.,60);//undershoot
    // turn(1,45);
-    Sleep(3.0);
-    move(0.3,4);
-    turn(1,67);
-    move(0.3,14);
-    turn(0,98);
-    move(0.6,51);
-    turn(0,93);
-    move(0.3,25);
+   // Sleep(3.0);
+    move(30.,13.5);
+    detectColorDDR();
+
+    //turn(1,67);
+
+   // move(30.,14);
+   // turn(0,98);
+   // move(60.,51);
+   // turn(0,93);
+   // move(30.,25);
 
 }
 
