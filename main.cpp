@@ -8,6 +8,7 @@
 #include <FEHUtility.h>
 #include <FEHMotor.h>
 #include <FEHServo.h>
+#include <math.h>
 
 //Instantiation of devices
 AnalogInputPin photoresis(FEHIO::P0_1);
@@ -41,9 +42,10 @@ void startUp(){//This function waits until the proteus screen has been tapped to
 void move(float speed, float distance){//direction 1 is forward, direction -1 is backwards, distance in inches, this function tells the robot which direction to move in and how far
     int counts = abs(distance)*COUNTS_PER_INCH;//the number of counts is equal to the distance times the defined constant COUNTS_PER_INCH
 
-    inputSpeed = speed;      //This value will be important later
+    float inputSpeed = speed;      //This value will be important later
 
-    leftSpeed = rightSpeed = speed
+    float leftSpeed, rightSpeed;
+    leftSpeed = rightSpeed = speed;
 
     right_encoder.ResetCounts();//reset the counts for both encoders
     left_encoder.ResetCounts();
@@ -53,15 +55,16 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     }else if(distance < 0){//If backward, show an acknowledgement on the proteus screen
         LCD.WriteLine("Going backwards");
     }else{
-        LCD.WriteLine("Improper distance parameter: %f" %distance);
+        LCD.WriteLine("Improper distance parameter");
     }
 
 
-    lastTime = TimeNow();
-    leftLastCounts = left_encoder.Counts();
-    rightLastCounts = right_encoder.Counts();
+    int lastTime = TimeNow();
+    int leftLastCounts = left_encoder.Counts();
+    int rightLastCounts = right_encoder.Counts();
+    int leftCurrentCounts, rightCurrentCounts, currTime;
+    float leftTickSpeed, rightTickSpeed;
     while(left_encoder.Counts() < counts && right_encoder.Counts() < counts){
-        LCD.WriteLine("L_Encoder position: %d\r" %left_encoder.Counts);    //Display the current encoder positions
         leftCurrentCounts = left_encoder.Counts();
         rightCurrentCounts = right_encoder.Counts();
         currTime = TimeNow();
