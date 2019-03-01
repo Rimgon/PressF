@@ -14,7 +14,7 @@
 AnalogInputPin photoresis(FEHIO::P0_1);
 FEHMotor leftmotor(FEHMotor::Motor1,9.0);//the left motor is on port 0 on the proteus
 FEHMotor rightmotor(FEHMotor::Motor0,9.0);//the right motor is on port 1 on the proteus
-DigitalEncoder right_encoder(FEHIO::P3_7);//right motor encoder is currently set to first port of 0 bank on proteus
+DigitalEncoder right_encoder(FEHIO::P2_7);//right motor encoder is currently set to first port of 0 bank on proteus
 DigitalEncoder left_encoder(FEHIO::P0_0);//left motor encoder is current set to second port of 0 bank on proteus
 
 
@@ -59,8 +59,8 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     leftmotor.SetPercent(-(distance/abs(distance)) * speed-2);//Set the left motor to it's appropriate speed and direction
     rightmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the right motor it it's appropriate speed and direction
 
-    while(left_encoder.Counts() < counts){
-        //LCD.WriteLine(left_encoder.Counts());
+    while((left_encoder.Counts()+right_encoder.Counts())/2 < counts){
+        LCD.WriteLine(right_encoder.Counts());
         ;
     }//Continue moving until the average of the two encoder counts is
 
@@ -80,7 +80,7 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
         LCD.WriteLine("Turning Right");
         leftmotor.SetPercent(21.);//Set turn percent to negative for the left motor, positive for the right motor to turn in place
         rightmotor.SetPercent(-18.);
-        while(left_encoder.Counts() < counts){LCD.WriteLine(left_encoder.Counts());}//continue while the average encoder counts is less than counts
+        while((left_encoder.Counts()+right_encoder.Counts())/2 < counts){LCD.WriteLine(left_encoder.Counts());}//continue while the average encoder counts is less than counts
         rightmotor.Stop();//Stop both motors
         leftmotor.Stop();
 
@@ -90,7 +90,7 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
         LCD.WriteLine("Turning Left");
         leftmotor.SetPercent(-21.);//Set turn percent to negative for the right motor and positive for the left motor
         rightmotor.SetPercent(18.);
-        while(left_encoder.Counts() < counts){LCD.WriteLine(left_encoder.Counts());}//continue while average encoder counts < counts
+        while((left_encoder.Counts()+right_encoder.Counts())/2 < counts){LCD.WriteLine(left_encoder.Counts());}//continue while average encoder counts < counts
         rightmotor.Stop();//Stop both motors
         leftmotor.Stop();
     }
@@ -104,10 +104,10 @@ void detectColorDDR(){//red is 1, blue is 2. This function is to detect the ligh
         turn(0,45);
         move(30.,3);
         turn(1,45);
-        move(30.,2);
+        move(30.,1.75);
         turn(0,103);
 
-        move(30.,-6);
+        move(30.,-3);
         Sleep(5.0);
        // ddrCheck = 1;
     }
@@ -116,23 +116,43 @@ void detectColorDDR(){//red is 1, blue is 2. This function is to detect the ligh
         LCD.SetBackgroundColor(BLUE);
         move(30.,3);
         turn(1,45);
-        move(30.,7);
-        turn(0,103);
-
-        move(30.,-6);
+        move(30.,6.5);
+        turn(0,112);
+        move(30.,-3.5);
         Sleep(5.0);
+
+       /*// move(40.,6);
+        move(30.,1);
+        turn(0,40);
+        move(30.,6);
+        turn(1,65);
+        move(40.,6);
+        turn(0,30);
+        move(60.,30);
+
+*/
+       // move(60.,43);
     }
 }
 
 
-void instructionSet(){//This function is the instruction set that is a list of instructions
-  startUp();
+void instructionSet(){//This function is the instr  uction set that is a list of instructions
+
    // turn(0,45);
     //move(30.,60);//undershoot
    // turn(1,45);
    // Sleep(3.0);
+
+    startUp();
+    //This is the DDR code
     move(30.,13.5);
-    detectColorDDR();
+   detectColorDDR();
+
+    //move(30.,3)
+   // turn(0,52);
+   // move(80.,40);
+ //  move(40.,60);
+
 
     //turn(1,67);
 
