@@ -64,6 +64,7 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     int rightLastCounts = right_encoder.Counts();
     int leftCurrentCounts, rightCurrentCounts, currTime;
     float leftTickSpeed, rightTickSpeed;
+
     while(left_encoder.Counts() < counts && right_encoder.Counts() < counts){
         leftCurrentCounts = left_encoder.Counts();
         rightCurrentCounts = right_encoder.Counts();
@@ -97,7 +98,6 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
         lastTime = currTime;
         leftLastCounts = leftCurrentCounts;
         rightLastCounts = rightCurrentCounts;
-
     }
 
     rightmotor.Stop();//stop motors
@@ -154,18 +154,18 @@ void instructionSet(){//This function is the instruction set that is a list of i
     //move(0.3,60);//undershoot
    // turn(1,45);
     Sleep(3.0);
-    move(0.3,4);
-    turn(1,67);
+    move(30.,6);
+    Sleep(1.0);
+    move(60.,6);
+    /*turn(1,67);
     move(0.3,14);
     turn(0,98);
     move(0.6,51);
     turn(0,93);
-    move(0.3,25);
-
+    move(0.3,25);*/
 }
 
 
-int main(void)//The main function is intentionally bare to make things easy to read
-{
+int main(void){//The main function is intentionally bare to make things easy to read
     instructionSet();
 }
