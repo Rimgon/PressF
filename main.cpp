@@ -14,15 +14,20 @@
 AnalogInputPin photoresis(FEHIO::P0_1);
 FEHMotor leftmotor(FEHMotor::Motor1,9.0);//the left motor is on port 0 on the proteus
 FEHMotor rightmotor(FEHMotor::Motor0,9.0);//the right motor is on port 1 on the proteus
-DigitalEncoder right_encoder(FEHIO::P3_7);//right motor encoder is currently set to first port of 0 bank on proteus
 DigitalEncoder left_encoder(FEHIO::P0_0);//left motor encoder is current set to second port of 0 bank on proteus
+DigitalEncoder right_encoder(FEHIO::P0_1);//right motor encoder is currently set to first port of 0 bank on proteus
 
 //Defining constants for use throughout the code
 #define FORWARD_PERCENT -25.0//This defines the default speed at which the robot goes forward
-#define COUNTS_PER_INCH 33.74//This defines how far per inch the robot will go in specification with the encoder
+#define COUNTS_PER_INCH 33.74//This defines how far per inch the robot will go in specification with the encoder. There are 318 counts in one revolution.
 #define BACKWARDS_PERCENT 18.0//This defines how fast the robot will go while moving backwards
 #define COUNTS_PER_DEGREE 1.7//This defines how many counts the encoder should do per degree
 #define POWER 0.02//This defines the power with which the 'pid' loop corrects itself. Higher is stronger, but prone to wobble
+
+//PID constants, tweak for tuning
+#define Kp 1
+#define Ki 1
+#define Kd 1
 
 int ddrCheck=0;
 
@@ -38,9 +43,12 @@ void startUp(){//This function waits until the proteus screen has been tapped to
 
 }
 
+//http://robotsforroboticists.com/pid-control/
 
 void move(float speed, float distance){//direction 1 is forward, direction -1 is backwards, distance in inches, this function tells the robot which direction to move in and how far
-    int counts = abs(distance)*COUNTS_PER_INCH;//the number of counts is equal to the distance times the defined constant COUNTS_PER_INCH
+    //int counts = abs(distance)*COUNTS_PER_INCH;//the number of counts is equal to the distance times the defined constant COUNTS_PER_INCH
+
+    int counts = distance;
 
     float inputSpeed = speed;      //This value will be important later
 
@@ -70,35 +78,11 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
         rightCurrentCounts = right_encoder.Counts();
         currTime = TimeNow();
 
-        leftTickSpeed = (leftCurrentCounts - leftLastCounts)/(currTime-lastTime);
-        rightTickSpeed = (rightCurrentCounts - rightLastCounts)/(currTime-lastTime);
-
-        if(leftTickSpeed>rightTickSpeed){       //Find which side is going faster. Here we handle left being fast
-            if(leftSpeed>inputSpeed){           //If we're at the capped speed, lower the speed rather than picking up the pace on the other side
-                //leftSpeed-=(leftSpeed/abs(leftSpeed))*POWER;
-                ;//Currently we're not going to care about the speed cap, pending solution
-            }else{                              //Otherwise, speed up the right side to try and catch up
-                rightSpeed+=(rightSpeed/abs(rightSpeed))*POWER;
-            }
-        }else if(rightTickSpeed>leftTickSpeed){  //Handle the right side being faster
-            if(rightSpeed>inputSpeed){           //If we're at the capped speed, lower the speed rather than picking up the pace on the other side
-                //rightSpeed-=(rightSpeed/abs(rightSpeed))*POWER;
-                ;//Currently we're not going to care about the speed cap, pending solution
-            }else{                              //Otherwise, speed up the right side to try and catch up
-                leftSpeed+=(leftSpeed/abs(leftSpeed))*POWER;
-            }
-        }
-
-        //distance/abs(distance) returns 1 or -1 for forwards or backwards motion, respectively
-        //Update the speeds
-        leftmotor.SetPercent(-(distance/abs(distance)) * leftSpeed);//Set the left motor to it's appropriate speed and direction
-        rightmotor.SetPercent(-(distance/abs(distance)) * rightSpeed);//Set the right motor it it's appropriate speed and direction
-
-        //Update measurements to have a new point to compare to
-        lastTime = currTime;
-        leftLastCounts = leftCurrentCounts;
-        rightLastCounts = rightCurrentCounts;
+        leftmotor.SetPercent(leftSpeed);
+        rightmotor.SetPercent(rightSpeed);
     }
+
+    LCD.WriteLine((counts/318.0)/((currTime-lastTime)/60.0));          //rotations/time per rotation in min
 
     rightmotor.Stop();//stop motors
     leftmotor.Stop();
@@ -149,23 +133,11 @@ void detectColorDDR(){//red is 1, blue is 2. This function is to detect the ligh
 
 
 void instructionSet(){//This function is the instruction set that is a list of instructions
-   // startUp();
-   // turn(0,45);
-    //move(0.3,60);//undershoot
-   // turn(1,45);
-    Sleep(3.0);
-    move(30.,6);
-    Sleep(1.0);
-    move(60.,6);
-    /*turn(1,67);
-    move(0.3,14);
-    turn(0,98);
-    move(0.6,51);
-    turn(0,93);
-    move(0.3,25);*/
+
 }
 
 
 int main(void){//The main function is intentionally bare to make things easy to read
-    instructionSet();
+    //instructionSet();
+    move(100.,3180);
 }
