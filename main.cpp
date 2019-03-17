@@ -9,6 +9,7 @@
 #include <FEHMotor.h>
 #include <FEHServo.h>
 #include <math.h>
+#include <LCDColors.h>
 
 //Instantiation of devices
 AnalogInputPin photoresis(FEHIO::P0_1);
@@ -25,9 +26,9 @@ DigitalEncoder right_encoder(FEHIO::P0_1);//right motor encoder is currently set
 #define POWER 0.02//This defines the power with which the 'pid' loop corrects itself. Higher is stronger, but prone to wobble
 
 //PID constants, tweak for tuning
-#define Kp 1
-#define Ki 1
-#define Kd 1
+#define Kp 0.1
+#define Ki 0
+#define Kd 0
 
 int ddrCheck=0;
 
@@ -50,10 +51,12 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
 
     int counts = distance;
 
-    float inputSpeed = speed;      //This value will be important later
+    float inputSpeed = (speed/100)*225;      //Convert from percentage speed value to a speed in RPMs
+    LCD.Write("Target speed: ");
+    LCD.WriteLine(inputSpeed);
 
     float leftSpeed, rightSpeed;
-    leftSpeed = rightSpeed = speed;
+    leftSpeed = rightSpeed = inputSpeed;
 
     right_encoder.ResetCounts();//reset the counts for both encoders
     left_encoder.ResetCounts();
@@ -70,19 +73,44 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     int lastTime = TimeNow();
     int leftLastCounts = left_encoder.Counts();
     int rightLastCounts = right_encoder.Counts();
-    int leftCurrentCounts, rightCurrentCounts, currTime;
-    float leftTickSpeed, rightTickSpeed;
+    int leftCurrentCounts, rightCurrentCounts;
+    float lRealSpeed, rRealSpeed, currTime, dt, lError, rError, lInt, rInt, lDeriv, rDeriv, lPrevError, rPrevError;
 
-    while(left_encoder.Counts() < counts && right_encoder.Counts() < counts){
+    while(left_encoder.Counts() < counts){      // && right_encoder.Counts() < counts
         leftCurrentCounts = left_encoder.Counts();
         rightCurrentCounts = right_encoder.Counts();
         currTime = TimeNow();
+        dt = currTime-lastTime;
 
-        leftmotor.SetPercent(leftSpeed);
-        rightmotor.SetPercent(rightSpeed);
+        lRealSpeed = ((leftCurrentCounts-leftLastCounts)/318)/(dt/60);      //Calculate how fast we're going in the current iteration
+        //LCD.SetFontColor(BLUE);
+        //LCD.WriteLine(dt);
+
+        //PID for the left side
+        lError = leftSpeed - lRealSpeed;
+        lInt = lInt + (lError*dt);
+        lDeriv = (lError - lPrevError)/dt;
+            //Final calculation for corrections
+        leftSpeed = Kp*lError + Ki*lInt + Kd*lDeriv;
+
+        //Set motors to calculated values
+        leftmotor.SetPercent(leftSpeed*100/225);
+        //rightmotor.SetPercent(rightSpeed*100/225);
+
+        //Move values from 'current' variables to 'last' variables to prep for next iteration
+        lastTime = currTime;
+        leftLastCounts = leftCurrentCounts;
+        rightLastCounts = rightCurrentCounts;
+        lPrevError = lError;
+
+        LCD.SetFontColor(CRIMSON);
+        LCD.Write(lError);
+        LCD.Write("\t");
+        LCD.SetFontColor(LIME);
+        LCD.WriteLine(leftSpeed);
     }
 
-    LCD.WriteLine((counts/318.0)/((currTime-lastTime)/60.0));          //rotations/time per rotation in min
+    //LCD.WriteLine((counts/318.0)/((currTime-lastTime)/60.0));          //rotations/time per rotation in min
 
     rightmotor.Stop();//stop motors
     leftmotor.Stop();
@@ -139,5 +167,5 @@ void instructionSet(){//This function is the instruction set that is a list of i
 
 int main(void){//The main function is intentionally bare to make things easy to read
     //instructionSet();
-    move(100.,3180);
+    move(50.,3180);
 }
