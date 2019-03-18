@@ -49,18 +49,21 @@ void startUp(){//This function waits until the proteus screen has been tapped to
 void move(float speed, float distance){//direction 1 is forward, direction -1 is backwards, distance in inches, this function tells the robot which direction to move in and how far
     //int counts = abs(distance)*COUNTS_PER_INCH;//the number of counts is equal to the distance times the defined constant COUNTS_PER_INCH
 
-    int counts = distance;
+    int counts = distance;      //Used for testing, revert to above line when finished
 
     float inputSpeed = (speed/100)*225;      //Convert from percentage speed value to a speed in RPMs
+
+    //DEBUG
     LCD.Write("Target speed: ");
     LCD.WriteLine(inputSpeed);
 
-    float leftSpeed, rightSpeed;
-    leftSpeed = rightSpeed = inputSpeed;
+    float leftSpeed, rightSpeed;            //Set up a variable for the speed on each side, since we're going to control them independantly
+    leftSpeed = rightSpeed = inputSpeed;    //Start with both sides at the same speed we passed in
 
     right_encoder.ResetCounts();//reset the counts for both encoders
     left_encoder.ResetCounts();
 
+    //DEBUG
     if(distance > 0){//If forward, show an acknowledgement on the proteus screen
         LCD.WriteLine("Going forward");
     }else if(distance < 0){//If backward, show an acknowledgement on the proteus screen
@@ -70,30 +73,32 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     }
 
 
-    int lastTime = TimeNow();
-    int leftLastCounts = left_encoder.Counts();
+    //Variable insantiation for PID
+    int lastTime = TimeNow();                                                                                           //Previous timestamp. Used to calculate dt
+    int leftLastCounts = left_encoder.Counts();                                                                         //Previous encoder positions, used to measure the change in position
     int rightLastCounts = right_encoder.Counts();
-    int leftCurrentCounts, rightCurrentCounts;
-    float lRealSpeed, rRealSpeed, currTime, dt, lError, rError, lInt, rInt, lDeriv, rDeriv, lPrevError, rPrevError;
+    int leftCurrentCounts, rightCurrentCounts;                                                                          //The current position of the encoders. Used to calculate change in position, and thus, rpm
+    float lRealSpeed, rRealSpeed, currTime, dt, lError, rError, lInt, rInt, lDeriv, rDeriv, lPrevError, rPrevError;     //A bunch of other variables used in the PID loop
 
+
+    //Loop until we've measured the desired distance in encoder counts
     while(left_encoder.Counts() < counts){      // && right_encoder.Counts() < counts
+        //Update a bunch of variables to reflect the current state of the robot for PID calculations
         leftCurrentCounts = left_encoder.Counts();
         rightCurrentCounts = right_encoder.Counts();
         currTime = TimeNow();
         dt = currTime-lastTime;
 
-        lRealSpeed = ((leftCurrentCounts-leftLastCounts)/318)/(dt/60);      //Calculate how fast we're going in the current iteration
-        //LCD.SetFontColor(BLUE);
-        //LCD.WriteLine(dt);
+        lRealSpeed = ((leftCurrentCounts-leftLastCounts)/318)/(dt/60);              //Calculate RPMs for the current iteration
 
-        //PID for the left side
-        lError = leftSpeed - lRealSpeed;
-        lInt = lInt + (lError*dt);
-        lDeriv = (lError - lPrevError)/dt;
-            //Final calculation for corrections
+    //PID for the left side
+        lError = leftSpeed - lRealSpeed;                        //Proportional part of PID. Calculate the current error value
+        lInt = lInt + (lError*dt);                              //Integral portion of PID. Sums error based on time with a reinmann sum
+        lDeriv = (lError - lPrevError)/dt;                      //Derivative portion of PID. Change in error/change in time is calculated here
+        //Take all these values and set the speed to this
         leftSpeed = Kp*lError + Ki*lInt + Kd*lDeriv;
 
-        //Set motors to calculated values
+        //Set motors to calculated values. Have to convert back to percentage from RPMs
         leftmotor.SetPercent(leftSpeed*100/225);
         //rightmotor.SetPercent(rightSpeed*100/225);
 
@@ -103,6 +108,7 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
         rightLastCounts = rightCurrentCounts;
         lPrevError = lError;
 
+        //DEBUG
         LCD.SetFontColor(CRIMSON);
         LCD.Write(lError);
         LCD.Write("\t");
@@ -110,7 +116,6 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
         LCD.WriteLine(leftSpeed);
     }
 
-    //LCD.WriteLine((counts/318.0)/((currTime-lastTime)/60.0));          //rotations/time per rotation in min
 
     rightmotor.Stop();//stop motors
     leftmotor.Stop();
