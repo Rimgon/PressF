@@ -83,7 +83,7 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     }
 
     //distance/abs(distance) returns 1 or -1 for forwards or backwards motion, respectively
-    leftmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the left motor to it's appropriate speed and direction
+    leftmotor.SetPercent(-(distance/abs(distance)) * (speed+.5));//Set the left motor to it's appropriate speed and direction
     rightmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the right motor it it's appropriate speed and direction
 
     while((left_encoder.Counts()/*+right_encoder.Counts()*/) < counts){
@@ -105,7 +105,7 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
     left_encoder.ResetCounts();
     if (direction == 0){//right
         LCD.WriteLine("Turning Right");
-        leftmotor.SetPercent(18.);//Set turn percent to negative for the left motor, positive for the right motor to turn in place
+        leftmotor.SetPercent(18.5);//Set turn percent to negative for the left motor, positive for the right motor to turn in place
         rightmotor.SetPercent(-18.);
         while((/*left_encoder.Counts()*/left_encoder.Counts()) < counts){LCD.WriteLine(right_encoder.Counts());}//continue while the average encoder counts is less than counts
         rightmotor.Stop();//Stop both motors
@@ -115,7 +115,7 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
     }
    else if (direction == 1){//left
         LCD.WriteLine("Turning Left");
-        leftmotor.SetPercent(-18.);//Set turn percent to negative for the right motor and positive for the left motor
+        leftmotor.SetPercent(-18.5);//Set turn percent to negative for the right motor and positive for the left motor
         rightmotor.SetPercent(18.);
         while(left_encoder.Counts() < counts){LCD.WriteLine(right_encoder.Counts());}//continue while average encoder counts < counts
         rightmotor.Stop();//Stop both motors
@@ -192,14 +192,14 @@ void coinDrop(){
     turn(1,47);
    // checkHeading(0);
     move(30.,14);
-    turn(0,91);
+    turn(0,93);
    // checkHeading(90);
     move(60.,20);
-    move(30.,20);
-    turn(1,60);
-    move(-30.,15);
-    turn(1,30);
-    move(-30.,2);
+    move(30.,18);
+    turn(1,55);
+    move(30.,-13);
+    turn(1,35);
+    move(30.,-2);
     turn(0,90);
     rightmotor.SetPercent(30.);
     leftmotor.SetPercent(30.);
@@ -207,6 +207,20 @@ void coinDrop(){
     rightmotor.Stop();
     leftmotor.Stop();
     servo.SetDegree(0);
+    Sleep(2.0);
+    move(30.,4);
+    turn(1,45);
+    move(30.,10);
+    turn(1,45);
+    move(30.,2);
+    turn(0,105);
+    move(30.,8);
+    turn(0,45);
+    move(30.,3);
+    turn(0,45);
+    move(30.,10);
+    turn(0,45);
+    move(30.,10);
 
 
 }
@@ -221,7 +235,15 @@ void instructionSet(){//This function is the instr  uction set that is a list of
    // Sleep(3.0);
     RPS.InitializeTouchMenu();
     startUp();
+
+
     coinDrop();
+   /* leftmotor.SetPercent(-32.5);
+    rightmotor.SetPercent(-30.);
+    Sleep(2.0);
+    leftmotor.Stop();
+    rightmotor.Stop();
+    */
 
 
   //  turn(0,90);

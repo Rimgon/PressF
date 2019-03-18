@@ -1,2 +1,2 @@
    text	   data	    bss	    dec	    hex	filename
-  46064	   3424	   5592	  55080	   d728	../FEHROBOTTESTCODE.elf
+  46288	   3424	   5592	  55304	   d808	../FEHROBOTTESTCODE.elf
