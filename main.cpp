@@ -27,9 +27,9 @@ DigitalEncoder right_encoder(FEHIO::P0_1);//right motor encoder is currently set
 #define DEBUG 1
 
 //PID constants, tweak for tuning
-#define Kp 1
-#define Ki 0
-#define Kd 0
+float Kp = 1;
+float Ki = 0;
+float Kd = 0;
 
 int ddrCheck=0;
 
