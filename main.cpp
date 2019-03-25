@@ -17,7 +17,8 @@ FEHMotor leftmotor(FEHMotor::Motor1,9.0);//the left motor is on port 0 on the pr
 FEHMotor rightmotor(FEHMotor::Motor0,9.0);//the right motor is on port 1 on the proteus
 DigitalEncoder right_encoder(FEHIO::P2_7);//right motor encoder is currently set to first port of 0 bank on proteus
 DigitalEncoder left_encoder(FEHIO::P0_0);//left motor encoder is current set to second port of 0 bank on proteus
-FEHServo servo(FEHServo::Servo0);
+FEHServo servo1(FEHServo::Servo0);
+FEHServo foosballArm(FEHServo::Servo1);
 
 
 //Defining constants for use throughout the code
@@ -56,15 +57,24 @@ void checkHeading(int degree){
 
 void startUp(){//This function waits until the proteus screen has been tapped to start the instruction set
 
-        /*float x,y;
+
+        float x,y;
         LCD.Clear(BLACK);
         LCD.SetFontColor(WHITE);
         LCD.WriteLine("Touch the screen to start");
         while(!LCD.Touch(&x,&y)){} //Wait for screen to be pressed
         while(LCD.Touch(&x,&y)){} //Wait for screen to be unpressed
-        */
+
+       float currentTime=TimeNow();
+       float finalTime=TimeNow()+35;
         //button to button is 5.25, between the lights 13.5
-        while(photoresis.Value()>.4){}
+        while(photoresis.Value()>.4){
+            currentTime=TimeNow();
+            if(currentTime>finalTime){
+                break;
+            }
+
+        }
 }
 
 
@@ -83,7 +93,7 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     }
 
     //distance/abs(distance) returns 1 or -1 for forwards or backwards motion, respectively
-    leftmotor.SetPercent(-(distance/abs(distance)) * (speed+.5));//Set the left motor to it's appropriate speed and direction
+    leftmotor.SetPercent(-(distance/abs(distance)) * (speed));//Set the left motor to it's appropriate speed and direction
     rightmotor.SetPercent(-(distance/abs(distance)) * speed);//Set the right motor it it's appropriate speed and direction
 
     while((left_encoder.Counts()/*+right_encoder.Counts()*/) < counts){
@@ -206,7 +216,7 @@ void coinDrop(){
     Sleep(1250);
     rightmotor.Stop();
     leftmotor.Stop();
-    servo.SetDegree(0);
+    servo1.SetDegree(0);
     Sleep(2.0);
     move(30.,4);
     turn(1,45);
@@ -224,20 +234,54 @@ void coinDrop(){
 
 
 }
+void foosball(){
+    move(30.,9);//moving out from start
+    turn(1,50);//turning towards right side
+    //checkHeading(270);
+    move(30.,13);//move to center for ramp
+    turn(0,95);//turn towards ramp
+   // checkHeading(0);
+    move(40.,46.5);//move up ramp
+   // move(30.,5);
+   // turn(0,60);//turn left
+   // move(30.,4);//move a bit
+   // turn(0,30);//turn left
+    turn(0,94);
+    leftmotor.SetPercent(20.);
+    rightmotor.SetPercent(20.);
+    Sleep(3.0);
+    leftmotor.Stop();
+    rightmotor.Stop();
+    move(20.,1.5);
+    foosballArm.SetDegree(90);//Arm goes down
+    Sleep(250);
+    move(30.,4);//move with foosball
+    Sleep(200);
+    turn(0,5);
+    Sleep(200);
+    move(30.,4);
+    Sleep(200);
+    turn(0,5);
+    Sleep(200);
+    move(30.,2);
+    foosballArm.SetDegree(170);//Arm goes up
+}
 
 
 
 void instructionSet(){//This function is the instr  uction set that is a list of instructions
-
+    foosballArm.SetDegree(170);
    // turn(0,45);
     //move(30.,60);//undershoot
    // turn(1,45);
    // Sleep(3.0);
     RPS.InitializeTouchMenu();
+
     startUp();
 
 
-    coinDrop();
+   // coinDrop();
+    foosball();
    /* leftmotor.SetPercent(-32.5);
     rightmotor.SetPercent(-30.);
     Sleep(2.0);
