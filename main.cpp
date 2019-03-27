@@ -17,7 +17,7 @@ FEHMotor leftmotor(FEHMotor::Motor1,9.0);//the left motor is on port 0 on the pr
 FEHMotor rightmotor(FEHMotor::Motor0,9.0);//the right motor is on port 1 on the proteus
 DigitalEncoder right_encoder(FEHIO::P2_7);//right motor encoder is currently set to first port of 0 bank on proteus
 DigitalEncoder left_encoder(FEHIO::P0_0);//left motor encoder is current set to second port of 0 bank on proteus
-FEHServo servo1(FEHServo::Servo0);
+FEHServo servo1(FEHServo::Servo7);
 FEHServo foosballArm(FEHServo::Servo1);
 
 
@@ -241,18 +241,18 @@ void foosball(){
     move(30.,13);//move to center for ramp
     turn(0,95);//turn towards ramp
    // checkHeading(0);
-    move(40.,46.5);//move up ramp
+    move(35.,46.5);//move up ramp
    // move(30.,5);
    // turn(0,60);//turn left
    // move(30.,4);//move a bit
    // turn(0,30);//turn left
-    turn(0,94);
+    turn(0,103);
     leftmotor.SetPercent(20.);
     rightmotor.SetPercent(20.);
     Sleep(3.0);
     leftmotor.Stop();
     rightmotor.Stop();
-    move(20.,1.5);
+    move(20.,1);
     foosballArm.SetDegree(90);//Arm goes down
     Sleep(250);
     move(30.,4);//move with foosball
@@ -261,10 +261,19 @@ void foosball(){
     Sleep(200);
     move(30.,4);
     Sleep(200);
-    turn(0,5);
+    turn(0,3);
     Sleep(200);
-    move(30.,2);
+    move(30.,1);
     foosballArm.SetDegree(170);//Arm goes up
+    Sleep(500);
+    turn(0,10);
+    move(30.,8);
+    turn(0,35);
+    move(30.,5);
+    turn(0,52.5);
+    move(30.,60);
+
+
 }
 
 
