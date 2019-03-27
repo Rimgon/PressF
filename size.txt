@@ -1,2 +1,6 @@
    text	   data	    bss	    dec	    hex	filename
+<<<<<<< HEAD
   36688	   3432	   5584	  45704	   b288	../FEHROBOTTESTCODE.elf
+=======
+  46652	   3424	   5604	  55680	   d980	../FEHROBOTTESTCODE.elf
+>>>>>>> beta

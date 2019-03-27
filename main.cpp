@@ -10,19 +10,23 @@
 #include <FEHServo.h>
 #include <math.h>
 #include <LCDColors.h>
+#include <FEHRPS.h>
 
 //Instantiation of devices
-AnalogInputPin photoresis(FEHIO::P0_1);
+AnalogInputPin photoresis(FEHIO::P1_1);
 FEHMotor leftmotor(FEHMotor::Motor0,9.0);//the left motor is on port 0 on the proteus
 FEHMotor rightmotor(FEHMotor::Motor1,9.0);//the right motor is on port 1 on the proteus
 DigitalEncoder left_encoder(FEHIO::P0_0);//left motor encoder is current set to second port of 0 bank on proteus
 DigitalEncoder right_encoder(FEHIO::P0_1);//right motor encoder is currently set to first port of 0 bank on proteus
+FEHServo servo1(FEHServo::Servo7);
+FEHServo foosballArm(FEHServo::Servo1);
+
 
 //Defining constants for use throughout the code
 #define FORWARD_PERCENT -25.0//This defines the default speed at which the robot goes forward
 #define COUNTS_PER_INCH 33.74//This defines how far per inch the robot will go in specification with the encoder. There are 318 counts in one revolution.
 #define BACKWARDS_PERCENT 18.0//This defines how fast the robot will go while moving backwards
-#define COUNTS_PER_DEGREE 1.7//This defines how many counts the encoder should do per degree
+#define COUNTS_PER_DEGREE 1.8412//This defines how many counts the encoder should do per degree
 
 
 //PID constants, tweak for tuning
@@ -33,9 +37,35 @@ float Kd = 0;
 int DEBUG = 2;
 
 int ddrCheck=0;
+void checkHeading(int degree){
+    while(1==1){
+        if(RPS.Heading()<degree-1){
+        leftmotor.SetPercent(30.);
+        rightmotor.SetPercent(-30.);
+        Sleep(250);
+        rightmotor.Stop();
+        leftmotor.Stop();
+        }
+        else if(RPS.Heading()>degree-1){
+            leftmotor.SetPercent(-30.);
+            rightmotor.SetPercent(30.);
+            Sleep(100);
+            rightmotor.Stop();
+            leftmotor.Stop();
+            Sleep(250);
+        }
+        else{
+            break;
+        }
+
+
+    }
+
+}
 
 
 void startUp(){//This function waits until the proteus screen has been tapped to start the instruction set
+
 
         float x,y;
         LCD.Clear(BLACK);
@@ -44,6 +74,16 @@ void startUp(){//This function waits until the proteus screen has been tapped to
         while(!LCD.Touch(&x,&y)){} //Wait for screen to be pressed
         while(LCD.Touch(&x,&y)){} //Wait for screen to be unpressed
 
+       float currentTime=TimeNow();
+       float finalTime=TimeNow()+35;
+        //button to button is 5.25, between the lights 13.5
+        while(photoresis.Value()>.4){
+            currentTime=TimeNow();
+            if(currentTime>finalTime){
+                break;
+            }
+
+        }
 }
 
 
@@ -157,9 +197,9 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
     left_encoder.ResetCounts();
     if (direction == 0){//right
         LCD.WriteLine("Turning Right");
-        leftmotor.SetPercent(21.);//Set turn percent to negative for the left motor, positive for the right motor to turn in place
+        leftmotor.SetPercent(18.5);//Set turn percent to negative for the left motor, positive for the right motor to turn in place
         rightmotor.SetPercent(-18.);
-        while(left_encoder.Counts() < counts){LCD.WriteLine(left_encoder.Counts());}//continue while the average encoder counts is less than counts
+        while((/*left_encoder.Counts()*/left_encoder.Counts()) < counts){LCD.WriteLine(right_encoder.Counts());}//continue while the average encoder counts is less than counts
         rightmotor.Stop();//Stop both motors
         leftmotor.Stop();
 
@@ -167,9 +207,9 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
     }
    else if (direction == 1){//left
         LCD.WriteLine("Turning Left");
-        leftmotor.SetPercent(-21.);//Set turn percent to negative for the right motor and positive for the left motor
+        leftmotor.SetPercent(-18.5);//Set turn percent to negative for the right motor and positive for the left motor
         rightmotor.SetPercent(18.);
-        while(left_encoder.Counts() < counts){LCD.WriteLine(left_encoder.Counts());}//continue while average encoder counts < counts
+        while(left_encoder.Counts() < counts){LCD.WriteLine(right_encoder.Counts());}//continue while average encoder counts < counts
         rightmotor.Stop();//Stop both motors
         leftmotor.Stop();
     }
@@ -178,21 +218,190 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
 
 
 void detectColorDDR(){//red is 1, blue is 2. This function is to detect the light at DDR and act accordingly.
-    if(photoresis.Value()<1){
-        turn(1,90);
-        move(0.3,-2);
+    while(photoresis.Value()>.4){}
+    LCD.WriteLine("Passed the while");
+    if(photoresis.Value()<.3){
+        LCD.SetBackgroundColor(RED);
+        turn(0,45);
+        move(30.,3);
+        turn(1,45);
+        move(30.,1.75);
+        turn(0,103);
+
+        move(30.,-3);
         Sleep(5.0);
-        ddrCheck = 1;
-    }else if (photoresis.Value()>1){
-       // move(0.3,5);
-        turn(1,90);
-        move(0.3,-2);
+       // ddrCheck = 1;
+    }
+    else  {
+        turn(0,45);
+
+        LCD.SetBackgroundColor(BLUE);
+        move(30.,3);
+        turn(1,45);
+        move(30.,6.5);
+        turn(0,112);
+        move(30.,-3.5);
         Sleep(5.0);
+        move(80.,60);
+//        turn(0,25);
+       // move(30.,1);
+     //   turn(1,25);
+     //   move(30.,9);
+
+      /* // move(40.,6);
+        move(30.,1);
+        turn(0,40);
+        move(30.,5);
+        turn(1,75);
+        move(40.,6);
+        turn(0,30);
+        move(60.,30);
+*/
+
+       // move(60.,43);
     }
 }
 
+void coinDrop(){
+   /* move(30.,2);
+    turn(1,40);
+    move(30.,15);
+    turn(0,40);
+    move(60.,45);
+    turn(0,90);
+    move(30.,6);
+    turn(0,90);
+    move(30.,2);
+    turn(1,90);
+    move(30.,4);
+    turn(0,90);
+    rightmotor.SetPercent(30.);
+    leftmotor.SetPercent(30.);
+    Sleep(3.0);
+    rightmotor.Stop();
+    leftmotor.Stop();
+    */
+   // servo.SetDegree(90);
+    move(30.,9);
+    turn(1,47);
+   // checkHeading(0);
+    move(30.,14);
+    turn(0,93);
+   // checkHeading(90);
+    move(60.,20);
+    move(30.,18);
+    turn(1,55);
+    move(30.,-13);
+    turn(1,35);
+    move(30.,-2);
+    turn(0,90);
+    rightmotor.SetPercent(30.);
+    leftmotor.SetPercent(30.);
+    Sleep(1250);
+    rightmotor.Stop();
+    leftmotor.Stop();
+    servo1.SetDegree(0);
+    Sleep(2.0);
+    move(30.,4);
+    turn(1,45);
+    move(30.,10);
+    turn(1,45);
+    move(30.,2);
+    turn(0,105);
+    move(30.,8);
+    turn(0,45);
+    move(30.,3);
+    turn(0,45);
+    move(30.,10);
+    turn(0,45);
+    move(30.,10);
 
-void instructionSet(){//This function is the instruction set that is a list of instructions
+
+
+void foosball(){
+    move(30.,9);//moving out from start
+    turn(1,50);//turning towards right side
+    //checkHeading(270);
+    move(30.,13);//move to center for ramp
+    turn(0,95);//turn towards ramp
+   // checkHeading(0);
+    move(35.,46.5);//move up ramp
+   // move(30.,5);
+   // turn(0,60);//turn left
+   // move(30.,4);//move a bit
+   // turn(0,30);//turn left
+    turn(0,103);
+    leftmotor.SetPercent(20.);
+    rightmotor.SetPercent(20.);
+    Sleep(3.0);
+    leftmotor.Stop();
+    rightmotor.Stop();
+    move(20.,1);
+    foosballArm.SetDegree(90);//Arm goes down
+    Sleep(250);
+    move(30.,4);//move with foosball
+    Sleep(200);
+    turn(0,5);
+    Sleep(200);
+    move(30.,4);
+    Sleep(200);
+    turn(0,3);
+    Sleep(200);
+    move(30.,1);
+    foosballArm.SetDegree(170);//Arm goes up
+    Sleep(500);
+    turn(0,10);
+    move(30.,8);
+    turn(0,35);
+    move(30.,5);
+    turn(0,52.5);
+    move(30.,60);
+
+
+}
+
+
+
+void instructionSet(){//This function is the instr  uction set that is a list of instructions
+    foosballArm.SetDegree(170);
+   // turn(0,45);
+    //move(30.,60);//undershoot
+   // turn(1,45);
+   // Sleep(3.0);
+    RPS.InitializeTouchMenu();
+
+    startUp();
+
+
+   // coinDrop();
+    foosball();
+   /* leftmotor.SetPercent(-32.5);
+    rightmotor.SetPercent(-30.);
+    Sleep(2.0);
+    leftmotor.Stop();
+    rightmotor.Stop();
+    */
+
+
+  //  turn(0,90);
+
+    //This is the DDR code
+   // move(30.,13.5);
+   //detectColorDDR();
+
+    //move(30.,3)
+   // turn(0,52);
+   // move(80.,40);
+ //  move(40.,60);
+
+
+    //turn(1,67);
+
+   // move(30.,14);
+   // turn(0,98);
+   // move(60.,51);
+   // turn(0,93);
+   // move(30.,25);
 
 }
 
