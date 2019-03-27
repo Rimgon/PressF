@@ -23,12 +23,11 @@ DigitalEncoder right_encoder(FEHIO::P0_1);//right motor encoder is currently set
 #define COUNTS_PER_INCH 33.74//This defines how far per inch the robot will go in specification with the encoder. There are 318 counts in one revolution.
 #define BACKWARDS_PERCENT 18.0//This defines how fast the robot will go while moving backwards
 #define COUNTS_PER_DEGREE 1.7//This defines how many counts the encoder should do per degree
-#define POWER 0.02//This defines the power with which the 'pid' loop corrects itself. Higher is stronger, but prone to wobble
 #define DEBUG 1
 
 //PID constants, tweak for tuning
-float Kp = 1;
-float Ki = 0;
+float Kp = 3;
+float Ki = 0.5;
 float Kd = 0;
 
 int ddrCheck=0;
@@ -56,6 +55,7 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     //DEBUG
     LCD.Write("Target speed: ");
     LCD.WriteLine(inputSpeed);
+    LCD.WriteLine(Ki);
     Sleep(1.5);
 
     float leftSpeed, rightSpeed;            //Set up a variable for the speed on each side, since we're going to control them independantly
@@ -80,7 +80,9 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     int leftLastCounts = left_encoder.Counts();                                                                         //Previous encoder positions, used to measure the change in position
     int rightLastCounts = right_encoder.Counts();
     int leftCurrentCounts, rightCurrentCounts;                                                                          //The current position of the encoders. Used to calculate change in position, and thus, rpm
-    float lRealSpeed, rRealSpeed, currTime, dt, lError, rError, lInt, rInt, lDeriv, rDeriv, lPrevError, rPrevError;     //A bunch of other variables used in the PID loop
+    double lRealSpeed, rRealSpeed, currTime, dt, lError, rError, lInt, rInt, lDeriv, rDeriv, lPrevError, rPrevError;     //A bunch of other variables used in the PID loop
+    lInt = 1;
+    Sleep(0.001);       //This somehow fixes things
 
 
     //Loop until we've measured the desired distance in encoder counts
@@ -98,16 +100,25 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
         lInt = lInt + (lError*dt);                              //Integral portion of PID. Sums error based on time with a reinmann sum
         lDeriv = (lError - lPrevError)/dt;                      //Derivative portion of PID. Change in error/change in time is calculated here
         //Take all these values and set the speed to this
-        leftSpeed = Kp*lError + Ki*lInt + Kd*lDeriv;
+        leftSpeed = ((Kp*lError) + (Ki*lInt)+ (Kd*lDeriv));
         LCD.SetFontColor(CRIMSON);
-        LCD.Write(((int)(lError*10))/10);
+        LCD.Write(((double)(((lError))*10))/10);
         LCD.Write("\t");
         LCD.SetFontColor(LIME);
-        LCD.Write(((int)(leftSpeed*10))/10);
+        LCD.Write(((double)(lInt*10))/10);
+        LCD.SetFontColor(RED);
+        LCD.WriteLine((lError*dt));
+        LCD.Write("\t");
 
         //Set motors to calculated values. Have to convert back to percentage from RPMs
         leftmotor.SetPercent((leftSpeed*1/2.25));
         //rightmotor.SetPercent(rightSpeed*100/225);
+
+        if(lInt>100){
+            lInt = 100;
+        }else if(lInt<-100){
+            lInt = -100;
+        }
 
         //Move values from 'current' variables to 'last' variables to prep for next iteration
         lastTime = currTime;
@@ -117,9 +128,7 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
         //DEBUG
         if(DEBUG){
             //MeasuredSpeed    Error   OutputSpeed
-            LCD.SetFontColor(RED);
-            LCD.WriteLine(lRealSpeed);
-            LCD.Write("\t");
+
             /*LCD.SetFontColor(GREEN);
             LCD.Write(leftCurrentCounts-leftLastCounts);
             LCD.Write("\t");
