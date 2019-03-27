@@ -47,8 +47,7 @@ void startUp(){//This function waits until the proteus screen has been tapped to
 
 
 void move(float speed, float distance){//direction 1 is forward, direction -1 is backwards, distance in inches, this function tells the robot which direction to move in and how far
-    //int counts = abs(distance)*COUNTS_PER_INCH;//the number of counts is equal to the distance times the defined constant COUNTS_PER_INCH
-    int counts = distance;      //Used for testing, revert to above line when finished
+    int counts = abs(distance)*COUNTS_PER_INCH;//the number of counts is equal to the distance times the defined constant COUNTS_PER_INCH
 
     float inputSpeed = (speed/100)*225;      //Convert from percentage speed value to a speed in RPMs
 
@@ -200,5 +199,5 @@ void instructionSet(){//This function is the instruction set that is a list of i
 
 int main(void){//The main function is intentionally bare to make things easy to read
     //instructionSet();
-    move(30.,318000);
+    move(30.,12);
 }
