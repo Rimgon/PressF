@@ -26,8 +26,8 @@ DigitalEncoder right_encoder(FEHIO::P0_1);//right motor encoder is currently set
 #define DEBUG 1
 
 //PID constants, tweak for tuning
-float Kp = 3;
-float Ki = 0.5;
+float Kp = 1.5;
+float Ki = 5;
 float Kd = 0;
 
 int ddrCheck=0;
@@ -44,7 +44,7 @@ void startUp(){//This function waits until the proteus screen has been tapped to
 
 }
 
-//http://robotsforroboticists.com/pid-control/
+
 
 void move(float speed, float distance){//direction 1 is forward, direction -1 is backwards, distance in inches, this function tells the robot which direction to move in and how far
     //int counts = abs(distance)*COUNTS_PER_INCH;//the number of counts is equal to the distance times the defined constant COUNTS_PER_INCH
@@ -55,7 +55,6 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     //DEBUG
     LCD.Write("Target speed: ");
     LCD.WriteLine(inputSpeed);
-    LCD.WriteLine(Ki);
     Sleep(1.5);
 
     float leftSpeed, rightSpeed;            //Set up a variable for the speed on each side, since we're going to control them independantly
@@ -81,7 +80,7 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
     int rightLastCounts = right_encoder.Counts();
     int leftCurrentCounts, rightCurrentCounts;                                                                          //The current position of the encoders. Used to calculate change in position, and thus, rpm
     double lRealSpeed, rRealSpeed, currTime, dt, lError, rError, lInt, rInt, lDeriv, rDeriv, lPrevError, rPrevError;     //A bunch of other variables used in the PID loop
-    lInt = 1;
+    lInt = rInt = 0;
     Sleep(0.001);       //This somehow fixes things
 
 
@@ -94,50 +93,54 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
         dt = currTime-lastTime;
 
         lRealSpeed = ((leftCurrentCounts-leftLastCounts)/318.0)/(dt/60.0);              //Calculate RPMs for the current iteration
+        rRealSpeed = ((rightCurrentCounts-rightLastCounts)/318.0)/(dt/60.0);              //Calculate RPMs for the current iteration
 
     //PID for the left side
         lError = inputSpeed - lRealSpeed;                       //Proportional part of PID. Calculate the current error value
         lInt = lInt + (lError*dt);                              //Integral portion of PID. Sums error based on time with a reinmann sum
         lDeriv = (lError - lPrevError)/dt;                      //Derivative portion of PID. Change in error/change in time is calculated here
-        //Take all these values and set the speed to this
-        leftSpeed = ((Kp*lError) + (Ki*lInt)+ (Kd*lDeriv));
-        LCD.SetFontColor(CRIMSON);
-        LCD.Write(((double)(((lError))*10))/10);
-        LCD.Write("\t");
-        LCD.SetFontColor(LIME);
-        LCD.Write(((double)(lInt*10))/10);
-        LCD.SetFontColor(RED);
-        LCD.WriteLine((lError*dt));
-        LCD.Write("\t");
+        leftSpeed = ((Kp*lError) + (Ki*lInt)+ (Kd*lDeriv));     //Take all these values and set the speed to this
+
+    //PID for the right side
+        rError = inputSpeed - rRealSpeed;                       //Proportional part of PID. Calculate the current error value
+        rInt = rInt + (rError*dt);                              //Integral portion of PID. Sums error based on time with a reinmann sum
+        rDeriv = (rError - rPrevError)/dt;                      //Derivative portion of PID. Change in error/change in time is calculated here
+        rightSpeed = ((Kp*rError) + (Ki*rInt)+ (Kd*rDeriv));     //Take all these values and set the speed to this
+
+
 
         //Set motors to calculated values. Have to convert back to percentage from RPMs
-        leftmotor.SetPercent((leftSpeed*1/2.25));
-        //rightmotor.SetPercent(rightSpeed*100/225);
+        leftmotor.SetPercent(leftSpeed*-1/2.25);
+        rightmotor.SetPercent(rightSpeed*-1/2.25);
 
-        if(lInt>100){
-            lInt = 100;
-        }else if(lInt<-100){
-            lInt = -100;
+
+
+
+        //DEBUG
+        if(DEBUG){
+            //lError    lInt    rError  rInt
+            LCD.SetFontColor(CRIMSON);
+            LCD.Write(((int)(((lError))*10))/10);
+            LCD.Write("\t");
+            LCD.SetFontColor(LIME);
+            LCD.Write(((int)(lInt*10))/10);
+            LCD.Write("\t");
+            LCD.SetFontColor(RED);
+            LCD.Write(((int)(((rError))*10))/10);
+            LCD.Write("\t");
+            LCD.SetFontColor(GREEN);
+            LCD.Write(((int)(rInt*10))/10);
+            LCD.Write("\n");
         }
 
         //Move values from 'current' variables to 'last' variables to prep for next iteration
         lastTime = currTime;
         leftLastCounts = leftCurrentCounts;
         lPrevError = lError;
+        rightLastCounts = rightCurrentCounts;
+        rPrevError = rError;
 
-        //DEBUG
-        if(DEBUG){
-            //MeasuredSpeed    Error   OutputSpeed
-
-            /*LCD.SetFontColor(GREEN);
-            LCD.Write(leftCurrentCounts-leftLastCounts);
-            LCD.Write("\t");
-            LCD.SetFontColor(BLUE);
-            LCD.WriteLine(dt);*/
-
-            //LCD.SetFontColor(GREEN);
-            //LCD.WriteLine((int)(leftSpeed*1/2.25));
-        }
+        //Delay between iterations to make sure the motors have time to do something before adjusting again
         Sleep(10);
     }
 
@@ -197,5 +200,5 @@ void instructionSet(){//This function is the instruction set that is a list of i
 
 int main(void){//The main function is intentionally bare to make things easy to read
     //instructionSet();
-    move(50.,318000);
+    move(30.,318000);
 }
