@@ -34,7 +34,7 @@ float Kp = 1.5;
 float Ki = 5;
 float Kd = 0;
 
-int DEBUG = 2;
+int DEBUG = 0;
 
 int ddrCheck=0;
 void checkHeading(int degree){
@@ -315,6 +315,7 @@ void coinDrop(){
     move(30.,10);
     turn(0,45);
     move(30.,10);
+}
 
 
 
@@ -407,6 +408,6 @@ void instructionSet(){//This function is the instr  uction set that is a list of
 
 
 int main(void){//The main function is intentionally bare to make things easy to read
-    //instructionSet();
+   // instructionSet();
     move(30.,12);
 }
