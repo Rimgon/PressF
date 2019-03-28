@@ -26,7 +26,7 @@ FEHServo foosballArm(FEHServo::Servo1);
 #define FORWARD_PERCENT -25.0//This defines the default speed at which the robot goes forward
 #define COUNTS_PER_INCH 33.74//This defines how far per inch the robot will go in specification with the encoder. There are 318 counts in one revolution.
 #define BACKWARDS_PERCENT 18.0//This defines how fast the robot will go while moving backwards
-#define COUNTS_PER_DEGREE 1.8412//This defines how many counts the encoder should do per degree
+#define COUNTS_PER_DEGREE 2.15//This defines how many counts the encoder should do per degree
 
 
 //PID constants, tweak for tuning
@@ -217,7 +217,7 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
 }
 
 
-void detectColorDDR(){//red is 1, blue is 2. This function is to detect the light at DDR and act accordingly.
+void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR and act accordingly.
     while(photoresis.Value()>.4){}
     LCD.WriteLine("Passed the while");
     if(photoresis.Value()<.3){
@@ -227,10 +227,9 @@ void detectColorDDR(){//red is 1, blue is 2. This function is to detect the ligh
         turn(1,45);
         move(30.,1.75);
         turn(0,103);
-
         move(30.,-3);
         Sleep(5.0);
-       // ddrCheck = 1;
+        //ddrCheck = 1;
     }
     else  {
         turn(0,45);
@@ -243,22 +242,6 @@ void detectColorDDR(){//red is 1, blue is 2. This function is to detect the ligh
         move(30.,-3.5);
         Sleep(5.0);
         move(80.,60);
-//        turn(0,25);
-       // move(30.,1);
-     //   turn(1,25);
-     //   move(30.,9);
-
-      /* // move(40.,6);
-        move(30.,1);
-        turn(0,40);
-        move(30.,5);
-        turn(1,75);
-        move(40.,6);
-        turn(0,30);
-        move(60.,30);
-*/
-
-       // move(60.,43);
     }
 }
 
@@ -388,7 +371,7 @@ void instructionSet(){//This function is the instr  uction set that is a list of
 
     //This is the DDR code
    // move(30.,13.5);
-   //detectColorDDR();
+   //runDDR();
 
     //move(30.,3)
    // turn(0,52);
@@ -442,10 +425,10 @@ void runComp(){
 
     //Token time
     turn(1, 20);
-    move(30., -16);
+    move(30., -8);
     //Drop the token
 
-    move(30., 16);
+    move(30., 8);
     //Hit the button!
 
 }
