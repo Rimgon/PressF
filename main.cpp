@@ -218,35 +218,25 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
 
 
 void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR and act accordingly.
-    while(photoresis.Value()>.4){}
+    //while(photoresis.Value()>.4){}
     LCD.WriteLine("Passed the while");
-    if(photoresis.Value()<.3){
+    if(true){                               //photoresis.Value()<.3
         LCD.SetBackgroundColor(RED);
-        turn(0,45);
-        move(30.,3);
-        turn(1,45);
-        move(30.,1.75);
-        turn(0,103);
+        turn(0,46);
+        move(30.,1);
+        turn(0,46);
         move(30.,-3);
-        Sleep(5.0);
-        move(30.,2);
-        turn(1,90);
+        Sleep(5.);
         move(30.,5);
-        turn(0,90);
-        move(40.,48);
-        //ddrCheck = 1;
-    }
-    else  {
-        turn(0,45);
-
+        turn(1, 92);
+        move(30.,7);
+        turn(0,92);
+    }else{                          //Blue
         LCD.SetBackgroundColor(BLUE);
-        move(30.,3);
-        turn(1,45);
-        move(30.,6.5);
-        turn(0,112);
-        move(30.,-3.5);
+        move(30, 4);
+        turn(0,92);
+        move(30,-4);
         Sleep(5.0);
-        move(40.,50);
     }
 }
 
@@ -396,28 +386,29 @@ void instructionSet(){//This function is the instr  uction set that is a list of
 
 void runComp(){
     //Leave the starting zone and align for DDR
-    move(30.,1);
+    move(30,1);
     turn(1, 46);
     //Do ddr things
     move(30.,12);
     runDDR();
 
-   /* //Scoot up the ramp
-    move(60., 24);
+    //Scoot up the ramp
+    move(60, 64);
     //Align for foosball
-    turn(0, 90);
-    move(30., -5);
-    move(30., 7);
+    move(30, -2);
+    turn(0, 92);
+    move(30, -5);
+    move(30, 7);
     //drop foosball arm
 
     //Carry foosball counters
-    move(30., 4);
+    move(30, 4);
     turn(0, 5);
-    move(30., 4);
+    move(30, 4);
     //Raise arm
 
     //Begin lever flipping
-    turn(0, 30);
+    /*turn(0, 30);
     move(20.,15);
     turn(0, 5);
     //Finesse the line up
@@ -445,6 +436,6 @@ int main(void){//The main function is intentionally bare to make things easy to 
    // instructionSet();
     //move(30.,12);
    // turn(0,45);
-    startUp();
+    //startUp();
     runComp();
 }
