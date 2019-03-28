@@ -406,8 +406,53 @@ void instructionSet(){//This function is the instr  uction set that is a list of
 
 }
 
+void runComp(){
+    //Leave the starting zone and align for DDR
+    move(40., 6);
+    turn(1, 45);
+    //Do ddr things
+
+    //Scoot up the ramp
+    move(60., 24);
+    //Align for foosball
+    turn(0, 90);
+    move(30., -5);
+    move(30., 7);
+    //drop foosball arm
+
+    //Carry foosball counters
+    move(30., 4);
+    turn(0, 5);
+    move(30., 4);
+    //Raise arm
+
+    //Begin lever flipping
+    turn(0, 30);
+    move(20.,15);
+    turn(0, 5);
+    //Finesse the line up
+
+    //drop arm
+    //Reset arm
+
+    move(30., 4);
+    turn(0, 45);
+    //Go down the ramp towards home
+    move(50., 24);
+
+    //Token time
+    turn(1, 20);
+    move(30., -16);
+    //Drop the token
+
+    move(30., 16);
+    //Hit the button!
+
+}
 
 int main(void){//The main function is intentionally bare to make things easy to read
    // instructionSet();
-    move(30.,12);
+    //move(30.,12);
+    startUp();
+    runComp();
 }
