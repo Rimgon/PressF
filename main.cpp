@@ -13,7 +13,7 @@
 #include <FEHRPS.h>
 
 //Instantiation of devices
-AnalogInputPin photoresis(FEHIO::P1_1);
+AnalogInputPin photoresis(FEHIO::P1_0);
 FEHMotor leftmotor(FEHMotor::Motor0,9.0);//the left motor is on port 0 on the proteus
 FEHMotor rightmotor(FEHMotor::Motor1,9.0);//the right motor is on port 1 on the proteus
 DigitalEncoder left_encoder(FEHIO::P0_0);//left motor encoder is current set to second port of 0 bank on proteus
@@ -151,8 +151,8 @@ void move(float speed, float distance){//direction 1 is forward, direction -1 is
 
 
         //Set motors to calculated values. Have to convert back to percentage from RPMs
-        leftmotor.SetPercent(leftSpeed*-1/2.25);
-        rightmotor.SetPercent(rightSpeed*-1/2.25);
+        leftmotor.SetPercent((distance/abs(distance))*(leftSpeed*-1/2.25));
+        rightmotor.SetPercent((distance/abs(distance))*(rightSpeed*-1/2.25));
 
 
         //DEBUG
@@ -229,6 +229,11 @@ void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR
         turn(0,103);
         move(30.,-3);
         Sleep(5.0);
+        move(30.,2);
+        turn(1,90);
+        move(30.,5);
+        turn(0,90);
+        move(40.,48);
         //ddrCheck = 1;
     }
     else  {
@@ -241,7 +246,7 @@ void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR
         turn(0,112);
         move(30.,-3.5);
         Sleep(5.0);
-        move(80.,60);
+        move(40.,50);
     }
 }
 
@@ -391,11 +396,13 @@ void instructionSet(){//This function is the instr  uction set that is a list of
 
 void runComp(){
     //Leave the starting zone and align for DDR
-    move(40., 6);
-    turn(1, 45);
+    move(30.,1);
+    turn(1, 46);
     //Do ddr things
+    move(30.,12);
+    runDDR();
 
-    //Scoot up the ramp
+   /* //Scoot up the ramp
     move(60., 24);
     //Align for foosball
     turn(0, 90);
@@ -430,12 +437,14 @@ void runComp(){
 
     move(30., 8);
     //Hit the button!
+    */
 
 }
 
 int main(void){//The main function is intentionally bare to make things easy to read
    // instructionSet();
     //move(30.,12);
+   // turn(0,45);
     startUp();
     runComp();
 }
