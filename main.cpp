@@ -42,8 +42,8 @@ void checkHeading(int degree){
     float timeout = TimeNow();
     float finalTime = timeout+5.;
 
-    while(1==1){
-        LCD.WriteLine("Degree");
+    while(true){
+        LCD.Write("Degree: ");
         LCD.WriteLine(RPS.Heading());
         timeout++;
        if(timeout>finalTime){
@@ -63,9 +63,7 @@ void checkHeading(int degree){
             rightmotor.Stop();
             leftmotor.Stop();
             Sleep(100);
-        }
-
-        else{
+        }else{
             break;
         }
 
@@ -76,26 +74,26 @@ void checkHeading(int degree){
 
 
 void startUp(){//This function waits until the proteus screen has been tapped to start the instruction set
+    float x,y;
+    LCD.Clear(BLACK);
+    LCD.SetFontColor(WHITE);
+    LCD.WriteLine("Touch the screen to start");
+    while(!LCD.Touch(&x,&y)){} //Wait for screen to be pressed
+    while(LCD.Touch(&x,&y)){} //Wait for screen to be unpressed
+    LCD.SetBackgroundColor(LIME);
+    LCD.SetFontColor(BLACK);
+    LCD.WriteLine("Touch registered...\nWaiting on light or 30 seconds");
 
-        float x,y;
-        LCD.Clear(BLACK);
-        LCD.SetFontColor(WHITE);
-        LCD.WriteLine("Touch the screen to start");
-        while(!LCD.Touch(&x,&y)){} //Wait for screen to be pressed
-        while(LCD.Touch(&x,&y)){} //Wait for screen to be unpressed
-
-       float currentTime=TimeNow();
-       float finalTime=TimeNow()+35;
-        //button to button is 5.25, between the lights 13.5
-        while(photoresis.Value()>.4){
-            currentTime=TimeNow();
-            if(currentTime>finalTime){
-                break;
-            }
-
+   float currentTime=TimeNow();
+   float finalTime=TimeNow()+35;
+    //button to button is 5.25, between the lights 13.5
+    while(photoresis.Value()>.4){
+        currentTime=TimeNow();
+        if(currentTime>finalTime){
+            break;
         }
+    }
 }
-
 
 
 void move(float speed, float distance){//direction 1 is forward, direction -1 is backwards, distance in inches, this function tells the robot which direction to move in and how far
@@ -230,7 +228,7 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
 void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR and act accordingly.
     //while(photoresis.Value()>.4){}
     LCD.WriteLine("Passed the while");
-    if(photoresis.Value()<.3){                               //
+    if(photoresis.Value()<.3){
         LCD.SetBackgroundColor(RED);
         turn(0,46);
         move(30,1);
@@ -242,7 +240,7 @@ void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR
         move(30,5);
         turn(1, 94);
         move(30,7);
-        turn(0,94);
+        turn(0,96);
     }else{                          //Blue
         LCD.SetBackgroundColor(BLUE);
         move(30, 6);
@@ -254,149 +252,6 @@ void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR
     }
 }
 
-void coinDrop(){
-   /* move(30.,2);
-    turn(1,40);
-    move(30.,15);
-    turn(0,40);
-    move(60.,45);
-    turn(0,90);
-    move(30.,6);
-    turn(0,90);
-    move(30.,2);
-    turn(1,90);
-    move(30.,4);
-    turn(0,90);
-    rightmotor.SetPercent(30.);
-    leftmotor.SetPercent(30.);
-    Sleep(3.0);
-    rightmotor.Stop();
-    leftmotor.Stop();
-    */
-   // servo.SetDegree(90);
-    move(30.,9);
-    turn(1,47);
-   // checkHeading(0);
-    move(30.,14);
-    turn(0,93);
-   // checkHeading(90);
-    move(60.,20);
-    move(30.,18);
-    turn(1,55);
-    move(30.,-13);
-    turn(1,35);
-    move(30.,-2);
-    turn(0,90);
-    rightmotor.SetPercent(30.);
-    leftmotor.SetPercent(30.);
-    Sleep(1250);
-    rightmotor.Stop();
-    leftmotor.Stop();
-    tokenServo.SetDegree(0);
-    Sleep(2.0);
-    move(30.,4);
-    turn(1,45);
-    move(30.,10);
-    turn(1,45);
-    move(30.,2);
-    turn(0,105);
-    move(30.,8);
-    turn(0,45);
-    move(30.,3);
-    turn(0,45);
-    move(30.,10);
-    turn(0,45);
-    move(30.,10);
-}
-
-
-
-void foosball(){
-    move(30.,9);//moving out from start
-    turn(1,50);//turning towards right side
-    //checkHeading(270);
-    move(30.,13);//move to center for ramp
-    turn(0,95);//turn towards ramp
-   // checkHeading(0);
-    move(35.,46.5);//move up ramp
-   // move(30.,5);
-   // turn(0,60);//turn left
-   // move(30.,4);//move a bit
-   // turn(0,30);//turn left
-    turn(0,103);
-    leftmotor.SetPercent(20.);
-    rightmotor.SetPercent(20.);
-    Sleep(3.0);
-    leftmotor.Stop();
-    rightmotor.Stop();
-    move(20.,1);
-    foosballArm.SetDegree(90);//Arm goes down
-    Sleep(250);
-    move(30.,4);//move with foosball
-    Sleep(200);
-    turn(0,5);
-    Sleep(200);
-    move(30.,4);
-    Sleep(200);
-    turn(0,3);
-    Sleep(200);
-    move(30.,1);
-    foosballArm.SetDegree(170);//Arm goes up
-    Sleep(500);
-    turn(0,10);
-    move(30.,8);
-    turn(0,35);
-    move(30.,5);
-    turn(0,52.5);
-    move(30.,60);
-
-
-}
-
-
-
-void instructionSet(){//This function is the instr  uction set that is a list of instructions
-    foosballArm.SetDegree(170);
-   // turn(0,45);
-    //move(30.,60);//undershoot
-   // turn(1,45);
-   // Sleep(3.0);
-    RPS.InitializeTouchMenu();
-
-    startUp();
-
-
-   // coinDrop();
-    foosball();
-   /* leftmotor.SetPercent(-32.5);
-    rightmotor.SetPercent(-30.);
-    Sleep(2.0);
-    leftmotor.Stop();
-    rightmotor.Stop();
-    */
-
-
-  //  turn(0,90);
-
-    //This is the DDR code
-   // move(30.,13.5);
-   //runDDR();
-
-    //move(30.,3)
-   // turn(0,52);
-   // move(80.,40);
- //  move(40.,60);
-
-
-    //turn(1,67);
-
-   // move(30.,14);
-   // turn(0,98);
-   // move(60.,51);
-   // turn(0,93);
-   // move(30.,25);
-
-}
 
 void runComp(){
     //reset servo
@@ -406,46 +261,46 @@ void runComp(){
     //Leave the starting zone and align for DDR
     move(30, 1.5);
     LCD.WriteLine("Turning towards DDR");
-    turn(1, 43);
-    checkHeading(0);
+    turn(1, 46);
+    ////checkHeading(0);
     //Do ddr things
-    move(30.,12);
+    move(30, 12);
     LCD.WriteLine("Runing DDR");
     runDDR();
-    //turn(0, 5);
 
     //Scoot up the ramp
     LCD.WriteLine("Going up the ramp");
     move(30,1);
-    checkHeading(90);
+    ////checkHeading(90);
     move(30, 29);
     LCD.WriteLine("Stabilizing...");
     Sleep(1.0);
-    checkHeading(90);
-    move(20, 29);
+    //checkHeading(90);
+    move(20, 26);
     //Align for foosball
     LCD.WriteLine("Aligning for foosball");
     move(30, -1);
     turn(0, 94);
     move(30, -3);
-    move(30, 1);
+    //move(30, 1);
     Sleep(1.0);
     //drop foosball arm
-    foosballArm.SetDegree(80);
+    foosballArm.SetDegree(70);
 
     //Carry foosball counters
     LCD.WriteLine("Moving foosball...");
     move(30, 5);
     turn(0, 5);
-    move(30, 4);
+    move(30, 5);
     //Raise arm
     foosballArm.SetDegree(170);
 
     //Begin lever flipping
     LCD.WriteLine("Aligning for lever");
-    move(20, 6);
+    turn(1,5);
+    move(20, 7);
     turn(0, 35);
-    move(20, 3);
+    move(20, 2);
     turn(0, 10);
     //Finesse the line up
 
@@ -454,20 +309,22 @@ void runComp(){
     foosballArm.SetDegree(100);
     Sleep(0.5);
     foosballArm.SetDegree(170);
-    move(20, 3);
+    move(20, 5);
     //Reset arm
 
     //move(30., 4);
     Sleep(0.5);
     turn(0, 43);
-    checkHeading(270);
+    //checkHeading(270);
     //Go down the ramp towards home
     LCD.WriteLine("Going home");
-    move(20, 40);
+    move(20, 20);
+    Sleep(1.0);
+    move(20, 20);
 
     //Token time
     LCD.WriteLine("Going for token");
-    turn(1, 30);                        //eligable for tweaks
+    turn(1, 30);
     move(30, -10);
     Sleep(1.0);
     //Drop the token
