@@ -39,22 +39,32 @@ int DEBUG = 0;
 int ddrCheck=0;
 
 void checkHeading(int degree){
+    float timeout = TimeNow();
+    float finalTime = timeout+5.;
+
     while(1==1){
-        if(RPS.Heading()<degree-1){
-        leftmotor.SetPercent(30.);
-        rightmotor.SetPercent(-30.);
-        Sleep(250);
+        LCD.WriteLine("Degree");
+        LCD.WriteLine(RPS.Heading());
+        timeout++;
+       if(timeout>finalTime){
+            break;
+        }
+       else if(RPS.Heading()<degree){
+        leftmotor.SetPercent(15.);
+        rightmotor.SetPercent(-15.);
+        Sleep(100);
         rightmotor.Stop();
         leftmotor.Stop();
         }
-        else if(RPS.Heading()>degree-1){
-            leftmotor.SetPercent(-30.);
-            rightmotor.SetPercent(30.);
+        else if(RPS.Heading()>degree){
+            leftmotor.SetPercent(-15.);
+            rightmotor.SetPercent(15.);
             Sleep(100);
             rightmotor.Stop();
             leftmotor.Stop();
-            Sleep(250);
+            Sleep(100);
         }
+
         else{
             break;
         }
@@ -390,31 +400,35 @@ void instructionSet(){//This function is the instr  uction set that is a list of
 
 void runComp(){
     //reset servo
+
     LCD.WriteLine("Resetting servo");
     foosballArm.SetDegree(170);
     //Leave the starting zone and align for DDR
     move(30, 1.5);
     LCD.WriteLine("Turning towards DDR");
-    turn(1, 46);
+    turn(1, 43);
+    checkHeading(0);
     //Do ddr things
     move(30.,12);
     LCD.WriteLine("Runing DDR");
     runDDR();
-    turn(0, 5);
+    //turn(0, 5);
 
     //Scoot up the ramp
     LCD.WriteLine("Going up the ramp");
-    move(30, 30);
+    move(30,1);
+    checkHeading(90);
+    move(30, 29);
     LCD.WriteLine("Stabilizing...");
     Sleep(1.0);
-    //turn(0, 5);
+    checkHeading(90);
     move(20, 29);
     //Align for foosball
     LCD.WriteLine("Aligning for foosball");
     move(30, -1);
-    turn(0, 92);
+    turn(0, 94);
     move(30, -3);
-    move(30, 2);
+    move(30, 1);
     Sleep(1.0);
     //drop foosball arm
     foosballArm.SetDegree(80);
@@ -446,6 +460,7 @@ void runComp(){
     //move(30., 4);
     Sleep(0.5);
     turn(0, 43);
+    checkHeading(270);
     //Go down the ramp towards home
     LCD.WriteLine("Going home");
     move(20, 40);
@@ -465,6 +480,7 @@ void runComp(){
 }
 
 int main(void){//The main function is intentionally bare to make things easy to read
+    RPS.InitializeTouchMenu();
     startUp();
     runComp();
 }
