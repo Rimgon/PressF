@@ -41,31 +41,37 @@ int ddrCheck=0;
 void checkHeading(int degree){
     float timeout = TimeNow();
     float finalTime = timeout+5.;
+    LCD.SetBackgroundColor(PURPLE);
+    LCD.WriteLine("Running checkHeading...");
+    LCD.Write("Degree: ");
+    LCD.WriteLine(RPS.Heading());
 
-    while(true){
-        LCD.Write("Degree: ");
-        LCD.WriteLine(RPS.Heading());
-        timeout++;
-       if(timeout>finalTime){
-            break;
-        }
-       else if(RPS.Heading()<degree){
-        leftmotor.SetPercent(15.);
-        rightmotor.SetPercent(-15.);
-        Sleep(100);
-        rightmotor.Stop();
-        leftmotor.Stop();
-        }
-        else if(RPS.Heading()>degree){
-            leftmotor.SetPercent(-15.);
-            rightmotor.SetPercent(15.);
-            Sleep(100);
-            rightmotor.Stop();
-            leftmotor.Stop();
-            Sleep(100);
-        }else{
-            break;
-        }
+    while(timeout<finalTime){
+
+        timeout=TimeNow();
+        if(abs(RPS.Heading()-degree)>1 &&RPS.Heading()>-1){
+            if(RPS.Heading()<degree){
+                leftmotor.SetPercent(10.);
+                rightmotor.SetPercent(-10.);
+                Sleep(100);
+                rightmotor.Stop();
+                leftmotor.Stop();
+                Sleep(250);
+            }
+            else if(RPS.Heading()>degree){
+                    leftmotor.SetPercent(-10.);
+                    rightmotor.SetPercent(10.);
+                    Sleep(100);
+                    rightmotor.Stop();
+                    leftmotor.Stop();
+                    Sleep(250);
+            }
+            LCD.Write("Degree: ");
+            LCD.WriteLine(RPS.Heading());
+
+         }else{
+             break;
+         }
 
 
     }
@@ -237,10 +243,12 @@ void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR
         leftmotor.SetPercent(25);
         rightmotor.SetPercent(25);
         Sleep(5.5);
-        move(30,5);
+        move(30,4);
         turn(1, 94);
-        move(30,7);
-        turn(0,96);
+        move(30,6);
+        turn(0,92);
+        move(30,-3);
+
     }else{                          //Blue
         LCD.SetBackgroundColor(BLUE);
         move(30, 6);
@@ -262,7 +270,7 @@ void runComp(){
     move(30, 1.5);
     LCD.WriteLine("Turning towards DDR");
     turn(1, 46);
-    ////checkHeading(0);
+
     //Do ddr things
     move(30, 12);
     LCD.WriteLine("Runing DDR");
@@ -270,17 +278,20 @@ void runComp(){
 
     //Scoot up the ramp
     LCD.WriteLine("Going up the ramp");
-    move(30,1);
-    ////checkHeading(90);
-    move(30, 29);
+    //move(30,1);
+    checkHeading(95);
+    move(30, 27.5);
     LCD.WriteLine("Stabilizing...");
     Sleep(1.0);
-    //checkHeading(90);
-    move(20, 26);
+    checkHeading(93);
+    move(20, 8);
+    checkHeading(92);
+    move(30,18);
     //Align for foosball
     LCD.WriteLine("Aligning for foosball");
     move(30, -1);
     turn(0, 94);
+
     move(30, -3);
     //move(30, 1);
     Sleep(1.0);
@@ -291,7 +302,7 @@ void runComp(){
     LCD.WriteLine("Moving foosball...");
     move(30, 5);
     turn(0, 5);
-    move(30, 5);
+    move(30, 5.5);
     //Raise arm
     foosballArm.SetDegree(170);
 
@@ -315,12 +326,16 @@ void runComp(){
     //move(30., 4);
     Sleep(0.5);
     turn(0, 43);
-    //checkHeading(270);
+    checkHeading(270);
     //Go down the ramp towards home
     LCD.WriteLine("Going home");
-    move(20, 20);
+    move(20, 14);
     Sleep(1.0);
-    move(20, 20);
+    checkHeading(272);
+    Sleep(250);
+    move(20, 26);
+    Sleep(250);
+    checkHeading(272);
 
     //Token time
     LCD.WriteLine("Going for token");
@@ -340,4 +355,6 @@ int main(void){//The main function is intentionally bare to make things easy to 
     RPS.InitializeTouchMenu();
     startUp();
     runComp();
+   // checkHeading(90);
+
 }
