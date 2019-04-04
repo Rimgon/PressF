@@ -209,8 +209,8 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
 
     right_encoder.ResetCounts();//Reset counts for both encoders
     left_encoder.ResetCounts();
-    if (direction == 0){//right
-        LCD.WriteLine("Turning Right");
+    if (direction == 0){//left
+        LCD.WriteLine("Turning right");
         leftmotor.SetPercent(18);//Set turn percent to negative for the left motor, positive for the right motor to turn in place
         rightmotor.SetPercent(-18);
         while((left_encoder.Counts()+right_encoder.Counts())/2 < counts){}//continue while the average encoder counts is less than counts
@@ -219,8 +219,8 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
 
 
     }
-   else if (direction == 1){//left
-        LCD.WriteLine("Turning Left");
+   else if (direction == 1){//right
+        LCD.WriteLine("Turning Right");
         leftmotor.SetPercent(-18);//Set turn percent to negative for the right motor and positive for the left motor
         rightmotor.SetPercent(18);
         while(left_encoder.Counts() < counts){}//continue while average encoder counts < counts
@@ -232,7 +232,7 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
 
 
 void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR and act accordingly.
-    //while(photoresis.Value()>.4){}
+   // while(photoresis.Value()>.4){}
     LCD.WriteLine("Passed the while");
     if(photoresis.Value()<.3){
         LCD.SetBackgroundColor(RED);
@@ -249,16 +249,22 @@ void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR
         turn(0,92);
         move(30,-3);
         checkHeading(93);
+        turn(0,1);
+        move(30, 27.5);
 
     }else{                          //Blue
         LCD.SetBackgroundColor(BLUE);
-        move(30, 5.75);
-        turn(0,92);
+        move(30, 6.5);
+        turn(0,93);
+        checkHeading(90);
         move(30,-4);
+
         leftmotor.SetPercent(25);
         rightmotor.SetPercent(25);
         Sleep(5.5);
-        checkHeading(93);
+        move(30,2);
+        checkHeading(89);
+        move(30, 24.5);
     }
 }
 
@@ -266,7 +272,7 @@ void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR
 void runComp(){
     //reset servo
 
-    LCD.WriteLine("Resetting servo");
+   /* LCD.WriteLine("Resetting servo");
     foosballArm.SetDegree(170);
     //Leave the starting zone and align for DDR
     move(30, 1.5);
@@ -276,25 +282,39 @@ void runComp(){
     //Do ddr things
     move(30, 12);
     LCD.WriteLine("Runing DDR");
+    */
+
+    move(30,7);
+
+    turn(1,139);
+    checkHeading(270);
+    move(30,-9);
+    tokenServo.SetDegree(0);
+    Sleep(1.);
+    move(30,11.25);
+    checkHeading(269);
+    turn(0,92);
+    move(30,6.5);
+
     runDDR();
 
     //Scoot up the ramp
     LCD.WriteLine("Going up the ramp");
     //move(30,1);
 
-    move(30, 27.5);
+
     LCD.WriteLine("Stabilizing...");
     Sleep(1.0);
-    checkHeading(90);
+    checkHeading(89);
     move(20, 8);
     checkHeading(88);
     move(30,17);
     //Align for foosball
     LCD.WriteLine("Aligning for foosball");
-    move(30, -.55);
+    move(30, -.48);
     turn(0, 90);
 
-    move(30, -3);
+    move(60, -3);
     //move(30, 1);
     Sleep(1.0);
     //drop foosball arm
@@ -313,15 +333,17 @@ void runComp(){
 
     //Begin lever flipping
     LCD.WriteLine("Aligning for lever");
-    turn(0,5);
-    move(20, 7);
+    turn(0,3);
+    move(20, 8);
     /////////////////
     foosballArm.SetDegree(100);
+    Sleep(1.0);
     //////////////
     turn(0, 40);
+
    // move(20, 1);
-    foosballArm.SetDegree(170);
-    turn(0, 17);
+    foosballArm.SetDegree(165);
+    turn(0, 13);
     //Finesse the line up
 
     //drop arm
@@ -329,26 +351,31 @@ void runComp(){
    // foosballArm.SetDegree(100);
     Sleep(0.5);
   //  foosballArm.SetDegree(170);
-    move(20, 14);
+    move(20, 11.5);
     //Reset arm
 
     //move(30., 4);
     Sleep(0.5);
-    turn(0, 35);
-    checkHeading(268);
+    turn(0, 30);
+    checkHeading(270);
     //Go down the ramp towards home
     LCD.WriteLine("Going home");
-    move(20, 14);
+    move(20, 10);
     Sleep(1.0);
-    checkHeading(273);
+    checkHeading(270);
     Sleep(250);
-    move(20, 22);
+    move(20, 12);
+
     Sleep(1.);
     checkHeading(270);
+    move(30,10);
+    turn(0,10);
+    checkHeading(270);
+    move(30,20);
 
     //Token time
     LCD.WriteLine("Going for token");
-    turn(1, 45);
+    //turn(1, 45);
     move(30, -10);
     Sleep(1.0);
     //Drop the token
