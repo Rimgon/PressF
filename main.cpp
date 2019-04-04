@@ -237,7 +237,7 @@ void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR
     if(photoresis.Value()<.3){
         LCD.SetBackgroundColor(RED);
         turn(0,46);
-        move(30,1);
+        move(30,2);
         turn(0,46);
         move(30,-3);
         leftmotor.SetPercent(25);
@@ -245,17 +245,19 @@ void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR
         Sleep(5.5);
         move(30,4);
         turn(1, 94);
-        move(30,5);
+        move(30,6.25);
         turn(0,92);
         move(30,-3);
-        checkHeading(93);
+        checkHeading(92);
         turn(0,1);
         move(30, 27.5);
 
     }else{                          //Blue
         LCD.SetBackgroundColor(BLUE);
-        move(30, 6.5);
-        turn(0,93);
+        turn(0,10);
+        checkHeading(10);
+        move(30, 7);
+        turn(0,83);
         checkHeading(90);
         move(30,-4);
 
@@ -291,9 +293,16 @@ void runComp(){
     move(30,-9);
     tokenServo.SetDegree(0);
     Sleep(1.);
-    move(30,11.25);
+
+    //working code
+    /*move(30,11.25);
     checkHeading(269);
     turn(0,92);
+    move(30,6.5);
+    */
+    move(30,12);
+    checkHeading(269);
+    turn(0,90);
     move(30,6.5);
 
     runDDR();
@@ -311,7 +320,7 @@ void runComp(){
     move(30,17);
     //Align for foosball
     LCD.WriteLine("Aligning for foosball");
-    move(30, -.48);
+    move(30, -.42);
     turn(0, 90);
 
     move(60, -3);
@@ -336,13 +345,13 @@ void runComp(){
     turn(0,3);
     move(20, 8);
     /////////////////
-    foosballArm.SetDegree(100);
+    foosballArm.SetDegree(90);
     Sleep(1.0);
     //////////////
     turn(0, 40);
 
    // move(20, 1);
-    foosballArm.SetDegree(165);
+    foosballArm.SetDegree(170);
     turn(0, 13);
     //Finesse the line up
 
@@ -356,7 +365,7 @@ void runComp(){
 
     //move(30., 4);
     Sleep(0.5);
-    turn(0, 30);
+    turn(0, 38);
     checkHeading(270);
     //Go down the ramp towards home
     LCD.WriteLine("Going home");
