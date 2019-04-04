@@ -213,7 +213,7 @@ void turn(int direction, int angle){//direction 0 is left, direction 1 is right,
         LCD.WriteLine("Turning Right");
         leftmotor.SetPercent(18);//Set turn percent to negative for the left motor, positive for the right motor to turn in place
         rightmotor.SetPercent(-18);
-        while((/*left_encoder.Counts()*/left_encoder.Counts()) < counts){}//continue while the average encoder counts is less than counts
+        while((left_encoder.Counts()+right_encoder.Counts())/2 < counts){}//continue while the average encoder counts is less than counts
         rightmotor.Stop();//Stop both motors
         leftmotor.Stop();
 
@@ -245,18 +245,20 @@ void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR
         Sleep(5.5);
         move(30,4);
         turn(1, 94);
-        move(30,6);
+        move(30,5);
         turn(0,92);
         move(30,-3);
+        checkHeading(93);
 
     }else{                          //Blue
         LCD.SetBackgroundColor(BLUE);
-        move(30, 6);
+        move(30, 5.75);
         turn(0,92);
         move(30,-4);
         leftmotor.SetPercent(25);
         rightmotor.SetPercent(25);
         Sleep(5.5);
+        checkHeading(93);
     }
 }
 
@@ -269,7 +271,7 @@ void runComp(){
     //Leave the starting zone and align for DDR
     move(30, 1.5);
     LCD.WriteLine("Turning towards DDR");
-    turn(1, 46);
+    turn(1, 45);
 
     //Do ddr things
     move(30, 12);
@@ -279,24 +281,25 @@ void runComp(){
     //Scoot up the ramp
     LCD.WriteLine("Going up the ramp");
     //move(30,1);
-    checkHeading(95);
+
     move(30, 27.5);
     LCD.WriteLine("Stabilizing...");
     Sleep(1.0);
-    checkHeading(93);
+    checkHeading(90);
     move(20, 8);
-    checkHeading(92);
-    move(30,18);
+    checkHeading(88);
+    move(30,17);
     //Align for foosball
     LCD.WriteLine("Aligning for foosball");
-    move(30, -1);
-    turn(0, 94);
+    move(30, -.55);
+    turn(0, 90);
 
     move(30, -3);
     //move(30, 1);
     Sleep(1.0);
     //drop foosball arm
     foosballArm.SetDegree(70);
+    Sleep(2.);
 
     //Carry foosball counters
     LCD.WriteLine("Moving foosball...");
@@ -305,46 +308,55 @@ void runComp(){
     move(30, 5.5);
     //Raise arm
     foosballArm.SetDegree(170);
+    Sleep(1.);
+
 
     //Begin lever flipping
     LCD.WriteLine("Aligning for lever");
-    turn(1,5);
+    turn(0,5);
     move(20, 7);
-    turn(0, 35);
-    move(20, 2);
-    turn(0, 10);
+    /////////////////
+    foosballArm.SetDegree(100);
+    //////////////
+    turn(0, 40);
+   // move(20, 1);
+    foosballArm.SetDegree(170);
+    turn(0, 17);
     //Finesse the line up
 
     //drop arm
     LCD.WriteLine("Lowering arm");
-    foosballArm.SetDegree(100);
+   // foosballArm.SetDegree(100);
     Sleep(0.5);
-    foosballArm.SetDegree(170);
-    move(20, 5);
+  //  foosballArm.SetDegree(170);
+    move(20, 14);
     //Reset arm
 
     //move(30., 4);
     Sleep(0.5);
-    turn(0, 43);
-    checkHeading(270);
+    turn(0, 35);
+    checkHeading(268);
     //Go down the ramp towards home
     LCD.WriteLine("Going home");
     move(20, 14);
     Sleep(1.0);
-    checkHeading(272);
+    checkHeading(273);
     Sleep(250);
-    move(20, 26);
-    Sleep(250);
-    checkHeading(272);
+    move(20, 22);
+    Sleep(1.);
+    checkHeading(270);
 
     //Token time
     LCD.WriteLine("Going for token");
-    turn(1, 30);
+    turn(1, 45);
     move(30, -10);
     Sleep(1.0);
     //Drop the token
     LCD.WriteLine("Dropping token");
     tokenServo.SetDegree(0);
+    Sleep(250);
+
+    checkHeading(150);
 
     move(30, 30);
     LCD.WriteLine("Hitting the button");
