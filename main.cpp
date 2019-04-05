@@ -254,10 +254,10 @@ void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR
 
     }else{//Blue
         LCD.SetBackgroundColor(BLUE);
-        turn(0,15);
-        checkHeading(15);
+        turn(0,20);
+        checkHeading(20);
         move(30, 7);
-        turn(0,78);
+        turn(0,73);
         checkHeading(90);
         move(30,-4);
 
