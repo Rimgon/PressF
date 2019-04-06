@@ -48,17 +48,17 @@ void checkHeading(int degree){
     while(TimeNow()<finalTime){
         if(abs(RPS.Heading()-degree)>1 && RPS.Heading()>-1){
             if(RPS.Heading()<degree){
-                leftmotor.SetPercent(10.);
-                rightmotor.SetPercent(-10.);
-                Sleep(100);
+                leftmotor.SetPercent(15.);
+                rightmotor.SetPercent(-15.);
+                Sleep(66);
                 rightmotor.Stop();
                 leftmotor.Stop();
                 Sleep(250);
             }
             else if(RPS.Heading()>degree){
-                    leftmotor.SetPercent(-10.);
-                    rightmotor.SetPercent(10.);
-                    Sleep(100);
+                    leftmotor.SetPercent(-15.);
+                    rightmotor.SetPercent(15.);
+                    Sleep(66);
                     rightmotor.Stop();
                     leftmotor.Stop();
                     Sleep(250);
