@@ -39,17 +39,14 @@ int DEBUG = 0;
 int ddrCheck=0;
 
 void checkHeading(int degree){
-    float timeout = TimeNow();
-    float finalTime = timeout+5.;
+    float finalTime = TimeNow()+5;
     LCD.SetBackgroundColor(PURPLE);
     LCD.WriteLine("Running checkHeading...");
     LCD.Write("Degree: ");
     LCD.WriteLine(RPS.Heading());
 
-    while(timeout<finalTime){
-
-        timeout=TimeNow();
-        if(abs(RPS.Heading()-degree)>1 &&RPS.Heading()>-1){
+    while(TimeNow()<finalTime){
+        if(abs(RPS.Heading()-degree)>1 && RPS.Heading()>-1){
             if(RPS.Heading()<degree){
                 leftmotor.SetPercent(10.);
                 rightmotor.SetPercent(-10.);
@@ -68,14 +65,12 @@ void checkHeading(int degree){
             }
             LCD.Write("Degree: ");
             LCD.WriteLine(RPS.Heading());
-
          }else{
              break;
          }
-
-
     }
 
+    LCD.WriteLine("Finished Check heading");
 }
 
 
@@ -254,18 +249,26 @@ void runDDR(){//red is 1, blue is 2. This function is to detect the light at DDR
 
     }else{//Blue
         LCD.SetBackgroundColor(BLUE);
+        //Angle 20 degrees away from the machines
         turn(0,20);
+        //Make sure we're aligned properly
         checkHeading(20);
+        //go forwards a bit
         move(30, 7);
+        //Line up with the button
         turn(0,73);
         checkHeading(90);
+        //back into it
         move(30,-4);
-
+        //Keep it held down for 5.5 seconds
         leftmotor.SetPercent(25);
         rightmotor.SetPercent(25);
         Sleep(5.5);
+        //Move up a bit
         move(30,2);
+        //align with the ramp
         checkHeading(89);
+        //Scoot up the ramp
         move(30, 24.5);
     }
 }
@@ -286,11 +289,15 @@ void runComp(){
     LCD.WriteLine("Runing DDR");
     */
 
+    //Come out of starting position
     move(30,7);
 
+    //Turn away from the token machine
     turn(1,139);
     checkHeading(270);
+    //back into the token machine
     move(30,-9);
+    //Drop off the token
     tokenServo.SetDegree(0);
     Sleep(1.);
 
@@ -300,9 +307,13 @@ void runComp(){
     turn(0,92);
     move(30,6.5);
     */
+    //Go forwards a bit
     move(30,12);
+    //face the back wall
     checkHeading(269);
+    //Turn parallel to the front of the DDR machines
     turn(0,90);
+    //Move up to the light
     move(30,6.5);
 
     runDDR();
